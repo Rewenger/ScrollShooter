@@ -115,10 +115,14 @@ int SubStartGame(void *data) {
 	SDL_Delay(100);
 	SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0x00, 0x00, 0x00 ) );
 	if( SDL_Flip( screen ) == -1 ) return 0;
+	
+	printf("Before entity!\n");
 	game = new GameEntity(GameThread, screen);
+	printf("After entity!\n");
 	game->StartGame();
+	printf("After gamestart!\n");
 	SDL_WaitThread(game->Thread, NULL);
-	GameQuit = true;
+	//GameQuit = true;
 	return 0;
 }
 //=====================================================================================================================
@@ -170,6 +174,7 @@ bool CreateLeaderboard() {
 }
 
 void SubAct() {
+	printf("SubAct!\n");
 	SubThread = SDL_CreateThread( SubStartGame, NULL );
 }
 //=====================================================================================================================
@@ -180,7 +185,7 @@ int main( int argc, char* args[] ) {
 
     if( load_files() == false )
         return 2;
-	
+
 	if( CreateLeaderboard() == false )
 		return 3;
 
@@ -232,9 +237,7 @@ int main( int argc, char* args[] ) {
 			}
 		}
 	}
-
-	SDL_KillThread(GameThread);
-	SDL_KillThread(SubThread);
+	game->EndGame = true;
 	clean_up();
     return 0;
 }

@@ -7,7 +7,8 @@
 #include "SDL_ttf.h"
 #include "SDL_mixer.h"
 #include "SDL_thread.h"
-#include "SDL_thread.h"
+#include "Imagework.h"
+#include "Timer.h"
 #include <stdlib.h>
 #include <string>
 #include <vector>
@@ -25,17 +26,21 @@ const int BUTTON_RIGHT = SDLK_d;
 const int BUTTON_SHOOT = SDLK_SPACE;
 const int BUTTON_ULTI = SDLK_RETURN;
 const int BUTTON_QUIT = SDLK_ESCAPE;
+const int FRAMES_PER_SECOND = 30;
 
-
+int InitGame(void *data);
 
 class GameEntity {
 private:
-	int ThreadFnc(void *data );
+	int (*ThreadFnc)(void*);
 public:
-	GameEntity(SDL_Thread thrd, SDL_Surface scrn);
+	bool EndGame;
+	int bgScroll;
+	SDL_Surface *Screen;
+	GameEntity(SDL_Thread *thrd, SDL_Surface *scrn);
 	void StartGame();
 	SDL_Thread *Thread;
-}
+};
 
 class GameObject {
 private:
