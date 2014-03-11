@@ -28,7 +28,7 @@ SDL_Surface *load_image( std::string filename )
         SDL_FreeSurface( loadedImage );
 
         if( optimizedImage != NULL )
-            SDL_SetColorKey( optimizedImage, SDL_SRCCOLORKEY, SDL_MapRGB( optimizedImage->format, 0, 0xFF, 0xFF ) );
+            SDL_SetColorKey( optimizedImage, SDL_SRCCOLORKEY, SDL_MapRGB( optimizedImage->format, COLOR_KEY_R, COLOR_KEY_G, COLOR_KEY_B ) );
     }
     return optimizedImage;
 }

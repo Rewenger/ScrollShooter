@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <string>
 
+#define COLOR_KEY_R 0xFF
+#define COLOR_KEY_G 0xBF
+#define COLOR_KEY_B 0xBF
+
 // ----------------   button class declaration   ---------------------------
 class Button
 {

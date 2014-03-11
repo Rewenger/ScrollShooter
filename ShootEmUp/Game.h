@@ -47,7 +47,8 @@ private:
 public:
 	// визуальная часть
 	int Image,		// число, указывающее на нужный набор спрайтов для отображения объекта
-		Animation;  // номер проигрываемой анимации
+		Animation,  // номер проигрываемой анимации
+		ClipNum;
 	// игровая часть
 	int Health,     // оставшаяся прочность объекта
 		x,			// координата Х объекта
@@ -77,13 +78,14 @@ public:
 
 class Unit: public GameObject {
 private:
-	int CurrentCooldown,			// текущее состояние таймера перезарядки
-		Id;							// идентификатор юнита
+	int CurrentCooldown;			// текущее состояние таймера перезарядки
 public:
 	int Charge,						// степень зарядки супер-способности
-		Cooldown;					// время перезарядки выстрела юнита
+		Cooldown,					// время перезарядки выстрела юнита
+		Id;							// идентификатор юнита
 	ProjectileType *BulletType;		// ссылка на тип снаряда юнита
 	bool IsEnemy;					// параметр, указывающий на принадлежность юнита к оппонентам
+	
 
 	// функции
 	Unit(int DataImageNumber, int PosX, int PosY, int hp, int BltType);		// конструктор
