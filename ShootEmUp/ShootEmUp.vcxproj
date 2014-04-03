@@ -68,14 +68,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Data.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameObjects.cpp" />
     <ClCompile Include="Imagework.cpp" />
     <ClCompile Include="Leaderboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Data.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameObjects.h" />
     <ClInclude Include="Imagework.h" />
     <ClInclude Include="Leaderboard.h" />
     <ClInclude Include="main.h" />

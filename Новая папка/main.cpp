@@ -227,22 +227,11 @@ int main( int argc, char* args[] ) {
 					apply_surface( 170, 50, SettingsWindow, screen );
 					CLSbtn.show(screen);
 				}
-			// Update the screen
+			//Update the screen
 			if( SDL_Flip( screen ) == -1 )
             return 1;
 			}
-			// Handle single button press
-			if( ExitLoop.type == SDL_KEYDOWN ) {
-				if ((ExitLoop.key.keysym.sym == BUTTON_SHOOT)||(ExitLoop.key.keysym.sym == BUTTON_ULTI)||(ExitLoop.key.keysym.sym == BUTTON_QUIT) ) {
-					game->HandleButtonPress(ExitLoop.key.keysym.sym);
-					if (ExitLoop.key.keysym.sym == BUTTON_QUIT) {
-						GameQuit = true;
-						break;
-					}
-				}
-			}
-
-			if (ExitLoop.type == SDL_QUIT ) {
+			if ( ExitLoop.type == SDL_QUIT ) {
 				GameQuit = true;
 				break;
 			}

@@ -2,14 +2,13 @@
 #include "SDL_image.h"
 #include "SDL_ttf.h"
 #include "SDL_mixer.h"
+#include "Game.h"
 #include <string>
 #include <vector>
 #include <direct.h>
 #include "SDL_thread.h"
 #include "Imagework.h"
 #include "Leaderboard.h"
-#include "Game.h"
-#include "Data.h"
 
 // game
 GameEntity *game;
@@ -22,6 +21,13 @@ TTF_Font *FNT_BrushM = NULL;
 SDL_Color textColor = { 0, 0, 0 };
 bool GameStarted = false;
 bool GameQuit = false;
+
+//Screen attributes
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
+const int SCREEN_BPP = 32;
+
+
 
 //The surfaces
 SDL_Surface *screen = NULL;

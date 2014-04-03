@@ -1,72 +1,17 @@
 #include "Game.h"
-
-//unsigned char test::X = 1;
-bool GameEntity::EndGame = false;
-int GameEntity::bgScroll = 0;
-SDL_Thread *GameEntity::Thread = NULL;
-SDL_Surface *GameEntity::Screen = NULL;
-SDL_Surface *GameEntity::LoadScreenBG = NULL;
-SDL_Surface *GameEntity::SkySquare = NULL;
-SDL_Surface *GameEntity::Sprites[100];
-Unit *GameEntity::Hero;
-SDL_Rect GameEntity::CharClips[100];
-Mix_Music *GameEntity::BGM1;
+#include "GameObjects.h"
 
 //===============================================================================
-void GameEntity::ProcessObject(GameObject *obj) {
-	apply_surface(obj->x, obj->y, Sprites[obj->Image], Screen, &CharClips[obj->ClipNum]);
-}
 
-void GameEntity::ProcessUnit(Unit *unit) {
-	apply_surface(unit->x, unit->y, Sprites[unit->Image], Screen, &CharClips[unit->ClipNum]);
-}
-void GameEntity::ProcessProjectile(Projectile *proj) {
 
-}
 //===============================================================================
-// Processes the whole thing about keyboard controls
-void GameEntity::HandleButtonPress(int key) {
-	switch (key) {
-		case BUTTON_SHOOT: 
-			//Hero->Shoot(); 
-			break;
-		case BUTTON_QUIT:
-			EndGame = true;
-			break;
-		case BUTTON_ULTI: 
-			//SDL_Thread *thread = SDL_CreateThread( Ultimate, nullptr );
-			break;
-    }
-
-}
-
-void GameEntity::HandleButtonHold() {
+void GameEntity::HandleInput() {
+/*	
 	Uint8 *keystates = SDL_GetKeyState(NULL);
-	bool left	= false, 
-		 right	= false, 
-		 up		= false, 
-		 down	= false;
-
-	if ((keystates[ BUTTON_RIGHT ])||(keystates[ SDLK_RIGHT])) {
-		right = true;
-		printf("right!\n");
-	} else if ((keystates[ BUTTON_LEFT ])||(keystates[ SDLK_LEFT])) {
-		printf("left!\n");
-		left = true;
+	
 	}
-
-	if ((keystates[ BUTTON_DOWN ])||(keystates[ SDLK_DOWN])) {
-		printf("down!\n");
-		down = true;
-	} else if ((keystates[ BUTTON_UP ])||(keystates[ SDLK_UP])) {
-		printf("up!\n");
-		up = true;
-	}
-
-	Hero->DirectionalAccel(left, right, up, down);
+*/
 }
-
-void HandleButtonHold();
 //===============================================================================
 GameEntity::GameEntity(SDL_Thread *thrd, SDL_Surface *scrn) {
 	printf("Entity initialized!\n");
@@ -75,7 +20,7 @@ GameEntity::GameEntity(SDL_Thread *thrd, SDL_Surface *scrn) {
 }
 
 void GameEntity::StartGame() {
-	Thread = SDL_CreateThread(InitGame, NULL);
+	Thread = SDL_CreateThread(InitGame, this);
 }
 
 bool GameEntity::PreloadImages() {
@@ -94,18 +39,13 @@ bool GameEntity::PreloadMusic() {
 	BGM1 = NULL;
 	BGM1 = Mix_LoadMUS("BGM/Main.ogg" ); 
 	if (BGM1 == NULL) return false;
-	return true;
 }
 
 bool GameEntity::SpriteClips() {
-	InitClipValues();
-
-	for (int i = 0; i <= Clip_Total; i++) {
-		CharClips[i].x = Clip_ValuesA[i][0];
-		CharClips[i].y = Clip_ValuesA[i][1];
-		CharClips[i].w = Clip_ValuesB[i][0];
-		CharClips[i].h = Clip_ValuesB[i][1];
-	}
+	CharClips[0].x = 0;
+	CharClips[0].y = 0;
+	CharClips[0].w = 90;
+	CharClips[0].h = 90;
 	return true;
 }
 
@@ -137,14 +77,15 @@ void GameEntity::NewGame() {
 	Mix_VolumeMusic(50);
 	Mix_PlayMusic( BGM1, -1 );
 
-	Hero = new Unit(0, 0, 300, 340, 5, 0);
+	Hero = new Unit(0, 300, 340, 5, 0, thislink);
 	Hero->Id = 0;
-	Hero->IsEnemy = false;
+	Hero->ClipNum = 0;
 }
 
 
 int GameEntity::InitGame(void *data) {
 	printf("Init started!\n");
+	thislink = data;
 	EndGame = false;
 
 	// stop menu music
@@ -191,10 +132,9 @@ int GameEntity::InitGame(void *data) {
 	while(!EndGame) {
 		fps.start();
 		ApplyBackground();
-		HandleButtonHold();
 
-		Hero->Move();
-		ProcessUnit(Hero);
+		Hero->Refresh();
+		//hero->Move();
 
 		//Update the screen
 		if( SDL_Flip(Screen) == -1 ) return 1;
