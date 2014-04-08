@@ -37,9 +37,16 @@ public:
 	static SDL_Surface *Screen;
 	static SDL_Surface *LoadScreenBG;
 	static SDL_Surface *SkySquare;
-	static SDL_Surface *Sprites[100];
+	
 	static Unit *Hero;
+
+	static int BulletCount;
+	static Projectile *Bullet[100];
+	static ProjectileType *BulletType[10];
+
+	static SDL_Surface *Sprites[100];
 	static SDL_Rect CharClips[100];
+	static SDL_Rect BulletClips[100];
 	static Mix_Music *BGM1;
 	// =============== Game initialization functions ================
 	static int InitGame(void *data);
@@ -49,12 +56,16 @@ public:
 	static bool SpriteClips();
 	static bool PreloadMusic();
 	static bool PreloadImages();
+	static bool GenerateProjectileTypes();
 	static void HandleButtonPress(int key);
 	static void HandleButtonHold();
 	// ================= Working with units ==================
+	static void Shoot(Unit *unit);
 	static void ProcessObject(GameObject *obj);
 	static void ProcessUnit(Unit *unit);
 	static void ProcessProjectile(Projectile *proj);
+	// ================= Projectile explosions ===================
+	static void Exp01(int target, int bullet);
 };
 
 #endif

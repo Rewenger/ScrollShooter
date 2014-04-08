@@ -11,6 +11,7 @@ public:
 	// визуальная часть
 	int Image,		// число, указывающее на нужный набор спрайтов для отображения объекта
 		Animation,  // номер проигрываемой анимации
+		AnimationMax,
 		ClipNum;
 	// игровая часть
 	int Health,     // оставшаяся прочность объекта
@@ -32,26 +33,27 @@ public:
 	void Move();													// заставляет объект перемещаться вперёд со скоростью и ускорением
 };
 
-
 //==============================================================================================================
 
 class ProjectileType {
-private:
-	int Damage;																		// величина наносимого снарядом урона
-	double VelocityX, VelocityY;													// скорость движения снаряда по осям X/Y
-	double AccelerationX, AccelerationY;											// ускорение снаряда по осям X/Y
 public:
+	int Damage;																		// величина наносимого снарядом урона
+	double Velocity;														   // скорость движения снаряда
+	double Acceleration;											// ускорение снаряда по осям X/Y
+	int dur;
+	int SpriteStart, SpriteEnd;													// начальный и конечный спрайт анимации на файле спрайтов снарядов
+	int GenerateCount; // количество созданных прожектайлов этого типа при выстреле
+	double AngleSeparate; // на сколько градусов будут отделяться друг от друга прожектайлы, если их несколько
 	void (*OnHit)(int TargetId, int ProjectileId);								//	ссылка на функцию, обрабатывающую столкновение с данным типом снаряда
-	ProjectileType(int dmg, double velx, double vely, double accx, double accy);	// конструктор
+	ProjectileType(int dmg, double vel, double acc, int spr1, int spr2, int hp);	// конструктор
 };
 
 //==============================================================================================================
 
 class Unit: public GameObject {
-private:
-	int CurrentCooldown;			// текущее состояние таймера перезарядки
 public:
 	int Charge,						// степень зарядки супер-способности
+		CurrentCooldown,
 		Cooldown,					// время перезарядки выстрела юнита
 		Id;							// идентификатор юнита
 	ProjectileType *BulletType;		// ссылка на тип снаряда юнита
@@ -60,7 +62,6 @@ public:
 
 	// функции
 	Unit(int DataImageNumber, int clip, int PosX, int PosY, int hp, int BltType);		// конструктор
-	void Shoot();								// функция, осуществляющая создание нового снаряда перед юнитом и запускающая перезарядку
 	void Kill();								// функция, обрабатывающее убийство юнита, как управляемого игроком, так и врагом
 	void Remove();								// удаляет юнита из игры, не обрабатывая это как уничтожение (вышел за пределы экрана)
 	void Damage(int value);						// функция, обрабатывающая получение юнитом урона
@@ -78,10 +79,13 @@ public:
 class Projectile: public GameObject {
 private:
 	double angle;		// угол, под которым перемещается снаряд
-	int Id;				// идентификатор снаряда
+	double curVel;
 public:
+	int Id;				// идентификатор снаряда
+	ProjectileType *ProjType;
+	bool Player;
 	Projectile(ProjectileType *type, int PosX, int PosY, double ang); // конструктор
-	void Fly();			// функция, осуществляющая перемещение снаряда вперёд и обработку связанных с этим событий
+	bool Fly();			// функция, осуществляющая перемещение снаряда вперёд и обработку связанных с этим событий
 	void Kill();		// функция, обрабатывающая смерть снаряда
 };
 

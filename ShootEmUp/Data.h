@@ -11,6 +11,10 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
+// other constants
+const int PROJ_WIDTH = 20;
+const int PROJ_HEIGHT = 20;
+
 // button controls
 const int BUTTON_UP = SDLK_w;
 const int BUTTON_DOWN = SDLK_s;
@@ -20,6 +24,7 @@ const int BUTTON_SHOOT = SDLK_SPACE;
 const int BUTTON_ULTI = SDLK_RETURN;
 const int BUTTON_QUIT = SDLK_ESCAPE;
 const int FRAMES_PER_SECOND = 30;
+const double CONST_PI = 0.017453;
 
 
 // sprite values

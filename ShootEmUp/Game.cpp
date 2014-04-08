@@ -3,16 +3,42 @@
 //unsigned char test::X = 1;
 bool GameEntity::EndGame = false;
 int GameEntity::bgScroll = 0;
+int GameEntity::BulletCount = 0;
 SDL_Thread *GameEntity::Thread = NULL;
 SDL_Surface *GameEntity::Screen = NULL;
 SDL_Surface *GameEntity::LoadScreenBG = NULL;
 SDL_Surface *GameEntity::SkySquare = NULL;
 SDL_Surface *GameEntity::Sprites[100];
+
 Unit *GameEntity::Hero;
+Projectile *GameEntity::Bullet[100];
+ProjectileType *GameEntity::BulletType[10];
+
 SDL_Rect GameEntity::CharClips[100];
+SDL_Rect GameEntity::BulletClips[100];
 Mix_Music *GameEntity::BGM1;
 
 //===============================================================================
+void GameEntity::Shoot(Unit *unit) {
+	if (unit->CurrentCooldown <= 0) {
+		BulletCount++;
+		if (BulletCount > 30)
+			BulletCount = 1;
+		void (*trigger)(int TargetId, int ProjectileId);
+		double ang = 0.0;
+		if (unit->BulletType == BulletType[0]) {
+			trigger = &Exp01;
+			ang = 270.0;
+			Bullet[BulletCount] = new Projectile(unit->BulletType, unit->x+35, unit->y, ang);
+			Bullet[BulletCount]->Player = true;
+			unit->CurrentCooldown = unit->Cooldown;
+			Bullet[BulletCount]->Id = BulletCount;
+			//if (Sprites[shtcnt*5+animation] != nullptr) 
+			//SetAnimation(1);
+		}
+	}
+}
+
 void GameEntity::ProcessObject(GameObject *obj) {
 	apply_surface(obj->x, obj->y, Sprites[obj->Image], Screen, &CharClips[obj->ClipNum]);
 }
@@ -21,14 +47,23 @@ void GameEntity::ProcessUnit(Unit *unit) {
 	apply_surface(unit->x, unit->y, Sprites[unit->Image], Screen, &CharClips[unit->ClipNum]);
 }
 void GameEntity::ProcessProjectile(Projectile *proj) {
+	// move animation one frame forward; after end frame go back to first
+	proj->Animation++;
+	if (proj->Animation > proj->AnimationMax)
+		proj->Animation = 0;
+	// fly forward
+	if (proj->Fly()) {
 
+	}
+	// draw at screen
+	apply_surface(proj->x, proj->y, Sprites[1], Screen, &BulletClips[proj->ProjType->SpriteStart+proj->Animation]);
 }
 //===============================================================================
 // Processes the whole thing about keyboard controls
 void GameEntity::HandleButtonPress(int key) {
 	switch (key) {
 		case BUTTON_SHOOT: 
-			//Hero->Shoot(); 
+			Shoot(Hero);
 			break;
 		case BUTTON_QUIT:
 			EndGame = true;
@@ -86,7 +121,9 @@ bool GameEntity::PreloadImages() {
 	// main sprite sheet
 	Sprites[0] = load_image( "Sprites/SpriteSheet.png" );
 	if ( Sprites[0] == NULL ) return false;
-
+	// main projectile sheet
+	Sprites[1] = load_image( "Sprites/WeaponSheet.png" );
+	if ( Sprites[1] == NULL ) return false;
 	return true;
 }
 
@@ -106,6 +143,35 @@ bool GameEntity::SpriteClips() {
 		CharClips[i].w = Clip_ValuesB[i][0];
 		CharClips[i].h = Clip_ValuesB[i][1];
 	}
+
+	int shift = -20;
+	for (int i = 0; i <= 7; i++) {
+		shift+=20;
+		BulletClips[i].x = shift;
+		BulletClips[i].y = 0;
+		BulletClips[i].w = 20;
+		BulletClips[i].h = 20;
+	}
+	return true;
+}
+
+void GameEntity::Exp01(int target, int bullet) {
+	/*Enemies[en]->Damage(temp->dmg);
+	FXcount++;
+	if (FXcount > 10) FXcount = 1;
+    Effects[FXcount] = new TObject(10, temp->x, temp->y, 1, 10, 4);
+	Effects[FXcount]->temporary = true;
+	FAvailable[FXcount] = true;
+	temp->Kill();*/
+}
+
+bool GameEntity::GenerateProjectileTypes() {
+	int i = -1;
+
+	i++;
+	BulletType[i] = new ProjectileType(1, 6.25, 0.4, 0, 7, 1);
+	BulletType[i]->GenerateCount = 1;
+	BulletType[i]->AngleSeparate = 0.0;
 	return true;
 }
 
@@ -140,6 +206,7 @@ void GameEntity::NewGame() {
 	Hero = new Unit(0, 0, 300, 340, 5, 0);
 	Hero->Id = 0;
 	Hero->IsEnemy = false;
+	Hero->BulletType = BulletType[0];
 }
 
 
@@ -171,6 +238,10 @@ int GameEntity::InitGame(void *data) {
 	if (!SpriteClips()) {
 		printf("Clipping sprites failed!\n");
 	}
+		// load character clips from sprite sheets
+	if (!GenerateProjectileTypes()) {
+		printf("Generating projectile types failed!\n");
+	}
 	// delay after loading (optional)
 	SDL_Delay(1000);
 
@@ -191,17 +262,32 @@ int GameEntity::InitGame(void *data) {
 	while(!EndGame) {
 		fps.start();
 		ApplyBackground();
-		HandleButtonHold();
-
+		// --- hero
+		if (Hero->Health > 0)
+			HandleButtonHold();
 		Hero->Move();
+		if (Hero->CurrentCooldown > 0)
+			Hero->CurrentCooldown--;
 		ProcessUnit(Hero);
+		// --- enemy units
 
-		//Update the screen
+		// --- projectiles
+		for (int i = 1; i <= 30; i++) {
+			if (Bullet[i] != nullptr) {
+				if (Bullet[i]->Health > 0) {
+					ProcessProjectile(Bullet[i]);
+				} else {
+					delete Bullet[i];
+					Bullet[i] = nullptr;
+				}
+			}
+		}
+		// --- Update the screen
 		if( SDL_Flip(Screen) == -1 ) return 1;
 	
-		FPScount++; //increment frame counter
+		FPScount++; // increment frame counter
 		if( (FPScap) && ( fps.get_ticks() < 1000/FRAMES_PER_SECOND ) ) {
-			//Sleep the remaining frame time 
+			// Sleep the remaining frame time 
 			SDL_Delay( (1000/FRAMES_PER_SECOND) - fps.get_ticks() );
 		}
 	}

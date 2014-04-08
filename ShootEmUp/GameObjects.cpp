@@ -8,6 +8,8 @@ GameObject::GameObject() {
 	ClipNum = 0;
 	width = Clip_ValuesB[ClipNum][0] - Clip_ValuesA[ClipNum][0];
 	height = Clip_ValuesB[ClipNum][1] - Clip_ValuesA[ClipNum][1];
+	Animation = 0;
+	AnimationMax = 0;
 }
 
 GameObject::GameObject(int DataImageNumber, int PosX, int PosY, int hp) {
@@ -18,6 +20,8 @@ GameObject::GameObject(int DataImageNumber, int PosX, int PosY, int hp) {
 	ClipNum = 0;
 	width = Clip_ValuesB[ClipNum][0] - Clip_ValuesA[ClipNum][0];
 	height = Clip_ValuesB[ClipNum][1] - Clip_ValuesA[ClipNum][1];
+	Animation = 0;
+	AnimationMax = 0;
 }
 
 void GameObject::Move() {
@@ -36,6 +40,42 @@ void GameObject::Move() {
 	}
 }
 //===============================================================================
+ProjectileType::ProjectileType(int dmg, double vel, double acc, int spr1, int spr2, int hp) {
+	Damage = dmg;
+	dur = hp;
+	Velocity = vel;
+	Acceleration = acc;
+	SpriteStart = spr1;
+	SpriteEnd = spr2;
+}
+//===============================================================================
+Projectile::Projectile(ProjectileType *type, int PosX, int PosY, double ang) {
+	x = PosX;
+	y = PosY;
+	angle = ang;
+	ProjType = type;
+	Health = type->dur;
+	Animation = 0;
+	AnimationMax = type->SpriteEnd-type->SpriteStart;
+	Player = false;
+	curVel = ProjType->Velocity;
+}
+bool Projectile::Fly() {
+	x += curVel*cos(angle*CONST_PI); 
+	y += curVel*sin(angle*CONST_PI);
+	curVel+=ProjType->Acceleration;
+
+	if ((x < 0)||( x + PROJ_WIDTH > SCREEN_WIDTH )||(y < 0)||( y + PROJ_HEIGHT > SCREEN_HEIGHT )) {
+		Health = 0;
+	} else {
+		return true;
+	}
+	return false;
+}
+void Kill() {
+
+}
+//===============================================================================
 Unit::Unit(int DataImageNumber, int clip, int PosX, int PosY, int hp, int BltType) {
 	x = PosX;
 	y = PosY;
@@ -44,8 +84,9 @@ Unit::Unit(int DataImageNumber, int clip, int PosX, int PosY, int hp, int BltTyp
 	ClipNum = clip;
 	width = Clip_ValuesB[ClipNum][0] - Clip_ValuesA[ClipNum][0];
 	height = Clip_ValuesB[ClipNum][1] - Clip_ValuesA[ClipNum][1];
-	//bullettype = btype;
 	Animation = 0;
+	AnimationMax = 0;
+	Cooldown = 0;
 
 	xVelocity = 0; 
 	yVelocity = 0;
