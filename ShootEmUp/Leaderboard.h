@@ -4,17 +4,16 @@
 #include <iostream>
 #include <Windows.h>
 #include <stdio.h>
-#include "Leaderboard.h"
+#include <exception>
 
 class Leaderboard {
-private:
-		char *filename;
-		int recordcount;
 public:
 		Leaderboard(char* name, int records);
 		void Update();
 		void Save();
 		//----------------------------
+		char *filename;
+		int recordcount;
 		int StatValue[11][2];
 		char* PlayerName[512];
 };

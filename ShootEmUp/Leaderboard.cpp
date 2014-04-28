@@ -3,6 +3,8 @@
 using namespace std;
 
 Leaderboard::Leaderboard(char* name, int records) {
+	if (name == NULL)
+		throw exception();
 	filename = name;
 	recordcount = records;
 }

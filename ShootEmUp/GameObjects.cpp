@@ -1,5 +1,7 @@
 #include "GameObjects.h"
 
+using namespace std;
+
 GameObject::GameObject() {
 	Image = 0;
 	x = 0;
@@ -50,6 +52,8 @@ ProjectileType::ProjectileType(int dmg, double vel, double acc, int spr1, int sp
 }
 //===============================================================================
 Projectile::Projectile(ProjectileType *type, int PosX, int PosY, double ang) {
+	if (type == nullptr)
+		throw exception();
 	x = PosX;
 	y = PosY;
 	angle = ang;

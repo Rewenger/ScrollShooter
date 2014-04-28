@@ -4,6 +4,7 @@
 #pragma once
 #include "Data.h"
 #include <math.h>
+#include <exception>
 
 class GameObject {
 private:
