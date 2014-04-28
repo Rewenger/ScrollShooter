@@ -1,0 +1,42 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+       <ItemGroup>
+         <ReleaseDir Include="ReleaseDir\" />
+	 <TestDir Include="TestDir\" />
+         <SolutionFile Include="ShootEmUp.sln" />
+       </ItemGroup>
+
+       <PropertyGroup>
+         <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+	 <Configuration2 Condition=" '$(Configuration2)' == '' ">Test</Configuration2>
+         <BuildPlatform Condition=" '$(BuildPlatform)' == '' ">Win32</BuildPlatform>
+       </PropertyGroup>
+
+       <Target Name="CompileRelease" DependsOnTargets="CompileTest">
+         <MSBuild Projects="@(SolutionFile)" Targets="Rebuild"
+                  Properties="OutDir=%(ReleaseDir.FullPath);Configuration=$(Configuration);Platform=$(BuildPlatform)" />
+       </Target>
+
+       <Target Name="CompileTest" DependsOnTargets="Init2">
+         <MSBuild Projects="@(SolutionFile)" Targets="Rebuild"
+                  Properties="OutDir=%(TestDir.FullPath);Configuration=$(Configuration2);Platform=$(BuildPlatform)" />
+       </Target>
+
+       <Target Name="Init2" DependsOnTargets="Clean2">
+         <MakeDir Directories="@(TestDir)" />
+       </Target>
+
+       <Target Name="Clean2" DependsOnTargets="Init1">
+         <RemoveDir Directories="@(TestDir)" />
+       </Target>
+
+       <Target Name="Init1" DependsOnTargets="Clean1">
+         <MakeDir Directories="@(ReleaseDir)" />
+       </Target>
+
+       <Target Name="Clean1">
+         <RemoveDir Directories="@(ReleaseDir)" />
+       </Target>
+
+
+</Project>
