@@ -7,7 +7,7 @@
        </ItemGroup>
 
        <PropertyGroup>
-         <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+         <Configuration>Release</Configuration>
 	 <Configuration2 Condition=" '$(Configuration2)' == '' ">Test</Configuration2>
          <BuildPlatform Condition=" '$(BuildPlatform)' == '' ">Win32</BuildPlatform>
        </PropertyGroup>

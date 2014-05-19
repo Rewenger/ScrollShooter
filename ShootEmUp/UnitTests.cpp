@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_case5) {
 
 	prjt = new ProjectileType(1, 6.25, 0.4, 0, 7, 1);
 	prj = new Projectile(prjt, 400, 300, 0.0);
-	prj->Fly();
+	BOOST_REQUIRE_EQUAL(true, prj->Fly());
 	BOOST_REQUIRE_LT(400, prj->x);
 }
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(test_case6) {
 
 	prjt = new ProjectileType(1, 6.25, 0.4, 0, 7, 1);
 	prj = new Projectile(prjt, 639, 479, 0.0);
-	prj->Fly();
+	BOOST_REQUIRE_EQUAL(false, prj->Fly());
 	BOOST_REQUIRE_EQUAL(0, prj->Health);
 }
 
@@ -82,6 +82,7 @@ BOOST_AUTO_TEST_CASE(test_case7) {
 	body = new Unit(0, 0, 300, 340, 5, 0);
 	body->DirectionalAccel(false, true, true, false);
 	BOOST_REQUIRE_LT(0, body->xVelocity);
+	BOOST_REQUIRE_GT(0, body->yVelocity);
 }
 
 // тест - проверка на торможение (отсутствие перемещений в направлении)

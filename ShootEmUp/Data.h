@@ -4,6 +4,7 @@
 #pragma once
 
 #include "SDL.h"
+#include <stdlib.h>
 
 //Screen attributes
 
@@ -28,9 +29,20 @@ const double CONST_PI = 0.017453;
 
 
 // sprite values
-const int Clip_Total = 0;
+const int  Clip_Total = 3;
+const int  Clip_Total_2 = 1;
 extern int Clip_ValuesA[100][2],
-	Clip_ValuesB[100][2];
+	       Clip_ValuesB[100][2];
+
+
+class SpriteData {
+public:
+	int SpriteSheet;			 // номер листа со спрайтами
+	int AnimationMax;			 // конец кадров с анимациями
+	SDL_Rect *Clips[25];         // SDL_rect, который можно использовать
+	void Init(int w, int h, int rows, int columns, int total); // нарезает входной спрайтлист на клипы
+};
+
 
 void InitClipValues();
 

@@ -11,7 +11,6 @@ GameObject::GameObject() {
 	width = Clip_ValuesB[ClipNum][0] - Clip_ValuesA[ClipNum][0];
 	height = Clip_ValuesB[ClipNum][1] - Clip_ValuesA[ClipNum][1];
 	Animation = 0;
-	AnimationMax = 0;
 }
 
 GameObject::GameObject(int DataImageNumber, int PosX, int PosY, int hp) {
@@ -23,7 +22,6 @@ GameObject::GameObject(int DataImageNumber, int PosX, int PosY, int hp) {
 	width = Clip_ValuesB[ClipNum][0] - Clip_ValuesA[ClipNum][0];
 	height = Clip_ValuesB[ClipNum][1] - Clip_ValuesA[ClipNum][1];
 	Animation = 0;
-	AnimationMax = 0;
 }
 
 void GameObject::Move() {
@@ -42,13 +40,12 @@ void GameObject::Move() {
 	}
 }
 //===============================================================================
-ProjectileType::ProjectileType(int dmg, double vel, double acc, int spr1, int spr2, int hp) {
+ProjectileType::ProjectileType(int dmg, double vel, double acc, int data, int hp) {
 	Damage = dmg;
 	dur = hp;
 	Velocity = vel;
 	Acceleration = acc;
-	SpriteStart = spr1;
-	SpriteEnd = spr2;
+	BulletDataNumber = data;
 }
 //===============================================================================
 Projectile::Projectile(ProjectileType *type, int PosX, int PosY, double ang) {
@@ -60,7 +57,7 @@ Projectile::Projectile(ProjectileType *type, int PosX, int PosY, double ang) {
 	ProjType = type;
 	Health = type->dur;
 	Animation = 0;
-	AnimationMax = type->SpriteEnd-type->SpriteStart;
+	//AnimationMax = type->SpriteEnd-type->SpriteStart;
 	Player = false;
 	curVel = ProjType->Velocity;
 }
@@ -76,9 +73,6 @@ bool Projectile::Fly() {
 	}
 	return false;
 }
-void Kill() {
-
-}
 //===============================================================================
 Unit::Unit(int DataImageNumber, int clip, int PosX, int PosY, int hp, int BltType) {
 	x = PosX;
@@ -86,24 +80,28 @@ Unit::Unit(int DataImageNumber, int clip, int PosX, int PosY, int hp, int BltTyp
 	Health = hp;
 	Image = DataImageNumber;
 	ClipNum = clip;
-	width = Clip_ValuesB[ClipNum][0] - Clip_ValuesA[ClipNum][0];
-	height = Clip_ValuesB[ClipNum][1] - Clip_ValuesA[ClipNum][1];
+	width = Clip_ValuesB[ClipNum][0];
+	height = Clip_ValuesB[ClipNum][1];
 	Animation = 0;
-	AnimationMax = 0;
 	Cooldown = 0;
 
 	xVelocity = 0; 
 	yVelocity = 0;
-	VelocityMax = 5.5;
+	VelocityMax = 7.0;
 
-	AccelX = 0.35;
-	AccelY = 0.35;
-	DecelRate = 0.30; 
+	AccelX = 0.7;
+	AccelY = 0.7;
+	DecelRate = 0.7; 
 	
 	temporary = false;
 	Cooldown = 0;
 	IsEnemy = true;
+	PatternNumber = 0;
+	PatternFrameCount = 0;
+}
 
+void Unit::Damage(int value) {
+	Health-=value;
 }
 
 void Unit::DirectionalAccel(bool left, bool right, bool up, bool down) {
