@@ -1,4 +1,4 @@
-cd D:\ShootEmUp unit testing
+cd D:\ShootEmUp
 
 c:\windows\microsoft.net\framework\v4.0.30319\msbuild.exe /p:Configuration=Release
 

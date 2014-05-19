@@ -60,8 +60,7 @@ BOOST_AUTO_TEST_CASE(test_case4) {
 
 // тест - проверка функции полёта снаряда (посередине экрана, проверка на успешное изменение координаты)
 BOOST_AUTO_TEST_CASE(test_case5) {
-
-	prjt = new ProjectileType(1, 6.25, 0.4, 0, 7, 1);
+	prjt = new ProjectileType(1, 6.25, 0.4, 0, 1);
 	prj = new Projectile(prjt, 400, 300, 0.0);
 	BOOST_REQUIRE_EQUAL(true, prj->Fly());
 	BOOST_REQUIRE_LT(400, prj->x);
@@ -70,7 +69,7 @@ BOOST_AUTO_TEST_CASE(test_case5) {
 // тест - проверка функции полёта снаряда (около границы экрана, проверка на смерть снаряда при пересечении)
 BOOST_AUTO_TEST_CASE(test_case6) {
 
-	prjt = new ProjectileType(1, 6.25, 0.4, 0, 7, 1);
+	prjt = new ProjectileType(1, 6.25, 0.4, 0, 1);
 	prj = new Projectile(prjt, 639, 479, 0.0);
 	BOOST_REQUIRE_EQUAL(false, prj->Fly());
 	BOOST_REQUIRE_EQUAL(0, prj->Health);
