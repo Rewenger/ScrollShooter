@@ -9,7 +9,11 @@ SDL_Thread *GameEntity::Thread = NULL;
 SDL_Surface *GameEntity::Screen = NULL;
 SDL_Surface *GameEntity::LoadScreenBG = NULL;
 SDL_Surface *GameEntity::SkySquare = NULL;
+SDL_Surface *GameEntity::InterfaceOverlay = NULL;
 SDL_Surface *GameEntity::Sprites[100];
+SDL_Surface *GameEntity::HpBar;
+SDL_Surface *GameEntity::EnergyBar;
+SDL_Surface *GameEntity::GrayBar;
 
 Unit *GameEntity::Hero;
 Unit *GameEntity::Enemies[100];
@@ -18,6 +22,7 @@ GameObject *GameEntity::SpecialFx[30];
 Projectile *GameEntity::Bullet[100];
 ProjectileType *GameEntity::BulletType[10];
 Type_PatternFunc GameEntity::PatternFunc[10];
+std::string GameEntity::LanguageFolder;
 
 SpriteData *GameEntity::FxData[100];
 SpriteData *GameEntity::BulletData[100];
@@ -189,7 +194,9 @@ void GameEntity::CreateExplosion(int x, int y, int type) {
 void GameEntity::HandleButtonPress(int key) {
 	switch (key) {
 		case BUTTON_SHOOT: 
-			Shoot(Hero);
+			Hero->Charge--;
+			if (Hero->Health > 0)
+				Shoot(Hero);
 			break;
 		case BUTTON_QUIT:
 			EndGame = true;
@@ -240,9 +247,18 @@ void GameEntity::StartGame() {
 bool GameEntity::PreloadImages() {
 	// starry sky
 	printf("Preloading images!");
-	SkySquare = NULL;
 	SkySquare = load_image("Data/Sky.png" );
 	if ( SkySquare == NULL ) return false;
+	// interface
+	InterfaceOverlay = load_image(LanguageFolder+"/Sideboard.png");
+	if ( InterfaceOverlay == NULL ) return false;
+	HpBar = load_image("Data/LifebarFill.png");
+	if ( HpBar == NULL ) return false;
+	EnergyBar = load_image("Data/EnergybarFill.png");
+	if ( EnergyBar == NULL ) return false;
+	GrayBar = load_image("Data/BarGrayed.png");
+	if ( GrayBar == NULL ) return false;
+
 	// main sprite sheet
 	Sprites[0] = load_image( "Sprites/SpriteSheet.png" );
 	if ( Sprites[0] == NULL ) return false;
@@ -278,7 +294,6 @@ bool GameEntity::PreloadMusic() {
 	SFX[1] = Mix_LoadWAV( "SFX/bazooka.wav" );
 	if( SFX[1] == NULL ) return false;
 
-	Mix_Volume(-1, 25);
 	return true;
 }
 
@@ -351,6 +366,26 @@ bool GameEntity::CleanUp() {
 	return true;
 }
 
+void GameEntity::GenerateOverlay() {
+	// fill with grayed bars
+	apply_surface(SCREEN_WIDTH+4, 191, GrayBar, Screen);
+	apply_surface(SCREEN_WIDTH+4, 363, GrayBar, Screen);
+	// clip the necessary amount of colored bars
+	SDL_Rect *clipHp = new SDL_Rect(), *clipEnergy = new SDL_Rect();
+	clipHp->x = 0; 
+	clipHp->y = 0; 
+	clipHp->h = 32; 
+	clipEnergy->x = 0; 
+	clipEnergy->y = 0; 
+	clipEnergy->h = 32; 
+	clipHp->w = Hero->Health*6+2;
+	clipEnergy->w = Hero->Charge*6+2;
+	// apply colored bars and interface
+	apply_surface(SCREEN_WIDTH+4, 191, HpBar, Screen, clipHp);
+	apply_surface(SCREEN_WIDTH+4, 363, EnergyBar, Screen, clipEnergy);
+	apply_surface(SCREEN_WIDTH-5, 0, InterfaceOverlay, Screen);
+}
+
 void GameEntity::ApplyBackground() {
 	bgScroll+=2;
 	if (bgScroll >= 512)
@@ -371,7 +406,6 @@ void GameEntity::ApplyBackground() {
 
 
 void GameEntity::NewGame() {
-	Mix_VolumeMusic(50);
 	Mix_PlayMusic( BGM1, -1 );
 
 	// set movement patterns
@@ -379,10 +413,11 @@ void GameEntity::NewGame() {
 	PatternFunc[1] = &Pattern02;
 
 	// create Hero
-	Hero = new Unit(0, 0, 300, 340, 5, 0);
+	Hero = new Unit(0, 0, 300, 340, HERO_HP_MAX, 0);
 	Hero->Id = -1;
 	Hero->IsEnemy = false;
 	Hero->BulletType = BulletType[0];
+	Hero->Charge = 10;
 
 	// create enemy
 	for (int i = 0; i < 100; i++)
@@ -508,6 +543,8 @@ int GameEntity::InitGame(void *data) {
 				}
 			}
 		}
+		// --- Overlay
+		GenerateOverlay();
 		// --- Update the screen
 		if( SDL_Flip(Screen) == -1 ) return 1;
 	

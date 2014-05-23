@@ -9,12 +9,15 @@
 //Screen attributes
 
 const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SIDEBAR_WIDTH = 145;
+const int SCREEN_HEIGHT = 585;
 const int SCREEN_BPP = 32;
 
 // other constants
 const int PROJ_WIDTH = 20;
 const int PROJ_HEIGHT = 20;
+const int HERO_HP_MAX = 20;
+const int HERO_CHARGE_MAX = 20;
 
 // button controls
 const int BUTTON_UP = SDLK_w;
@@ -26,7 +29,6 @@ const int BUTTON_ULTI = SDLK_RETURN;
 const int BUTTON_QUIT = SDLK_ESCAPE;
 const int FRAMES_PER_SECOND = 30;
 const double CONST_PI = 0.017453;
-
 
 // sprite values
 const int  Clip_Total = 3;

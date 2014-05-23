@@ -29,6 +29,7 @@ private:
 	int (*ThreadFnc)(void*);
 public:
 	GameEntity(SDL_Thread *thrd, SDL_Surface *scrn);
+	static std::string LanguageFolder;
 
 	static bool EndGame;
 	static int bgScroll;
@@ -39,6 +40,10 @@ public:
 	static SDL_Surface *Screen;
 	static SDL_Surface *LoadScreenBG;
 	static SDL_Surface *SkySquare;
+	static SDL_Surface *InterfaceOverlay;
+	static SDL_Surface *HpBar;
+	static SDL_Surface *EnergyBar;
+	static SDL_Surface *GrayBar;
 	
 	static Unit *Hero;
 	static Unit *Enemies[100];
@@ -68,6 +73,7 @@ public:
 	static bool GenerateProjectileTypes();
 	static void HandleButtonPress(int key);
 	static void HandleButtonHold();
+	static void GenerateOverlay();
 	// ================= Working with units ==================
 	static void Shoot(Unit *unit);
 	static void ProcessObject(GameObject *obj);

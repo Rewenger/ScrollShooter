@@ -1,0 +1,7 @@
+Sound volume:
+Music volume:
+Language:
+
+Game relaunch is required for 
+the language settings to take 
+effect.

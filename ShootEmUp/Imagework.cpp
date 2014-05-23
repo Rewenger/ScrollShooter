@@ -76,6 +76,17 @@ void set_clips()
     clips[ CLIP_MOUSEOUT + CLIP_MAXSTATES*CurType].y = 50;
     clips[ CLIP_MOUSEOUT + CLIP_MAXSTATES*CurType].w = 120;
     clips[ CLIP_MOUSEOUT + CLIP_MAXSTATES*CurType].h = 50;
+	//-------- type 2: small button, 30*30 -----------
+	CurType = 2;
+	clips[ CLIP_MOUSEOVER + CLIP_MAXSTATES*CurType].x = 0;
+    clips[ CLIP_MOUSEOVER + CLIP_MAXSTATES*CurType].y = 0;
+    clips[ CLIP_MOUSEOVER + CLIP_MAXSTATES*CurType].w = 30;
+    clips[ CLIP_MOUSEOVER + CLIP_MAXSTATES*CurType].h = 30;
+
+    clips[ CLIP_MOUSEOUT + CLIP_MAXSTATES*CurType].x = 0;
+    clips[ CLIP_MOUSEOUT + CLIP_MAXSTATES*CurType].y = 30;
+    clips[ CLIP_MOUSEOUT + CLIP_MAXSTATES*CurType].w = 30;
+    clips[ CLIP_MOUSEOUT + CLIP_MAXSTATES*CurType].h = 30;
 }
 
 Button::Button( int x, int y, int w, int h, SDL_Surface* bsht, void (*onClk)(), int layout = 0)

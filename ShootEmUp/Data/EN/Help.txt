@@ -1,0 +1,9 @@
+- Use your gunship to defeat 
+incoming enemy gunships!
+- Controls: W/S/A/D
+- Fire: hold SPACE bar
+- Special attacks: Q, E
+- Special attacks use energy.
+- Energy restores over time.
+
+Made by Rewenger, Katesk, 2014.
