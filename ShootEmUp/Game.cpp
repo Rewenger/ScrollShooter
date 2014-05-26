@@ -5,6 +5,8 @@ bool GameEntity::EndGame = false;
 int GameEntity::bgScroll = 0;
 int GameEntity::BulletCount = 0;
 int GameEntity::FxCount = 0;
+int GameEntity::SpawnTimer = 0;
+int GameEntity::EnemyCount = 0;
 SDL_Thread *GameEntity::Thread = NULL;
 SDL_Surface *GameEntity::Screen = NULL;
 SDL_Surface *GameEntity::LoadScreenBG = NULL;
@@ -54,11 +56,20 @@ void GameEntity::Exp01(int target, int bullet) {
 	Bullet[bullet]->Health--;
 	CreateExplosion(Bullet[bullet]->x-100, Bullet[bullet]->y-100, 2);
 }
+// explosion of bullet #2
+void GameEntity::Exp02(int target, int bullet) {
+	Hero->Damage(Bullet[bullet]->ProjType->Damage);
+	if (Hero->Health <= 0) {
+		CreateExplosion(Hero->x-100, Hero->y-100, 3);
+	}
+	Bullet[bullet]->Health--;
+	CreateExplosion(Bullet[bullet]->x-100, Bullet[bullet]->y-100, 2);
+}
 
 
 // movement pattern #1
 // moves diagonally downright, follows right, diagonally right-upwards and disappears
-void Pattern01(Unit *target) {
+void GameEntity::Pattern01(Unit *target) {
 	target->PatternFrameCount++;
 	int x = target->PatternFrameCount;
 	if (x < 30) {
@@ -70,13 +81,17 @@ void Pattern01(Unit *target) {
 	if ((x > 200)&&(x < 230)) {
 		target->DirectionalAccel(false, true, true, false);
 	}
+
 	if (x > 230) {
 		target->Health = 0;
 	}
+
+	if (x%60 == 0)
+		Shoot(target);
 }
 // movement pattern #2
 // moves diagonally downleft, follows left, diagonally left-upwards and disappears
-void Pattern02(Unit *target) {
+void GameEntity::Pattern02(Unit *target) {
 	target->PatternFrameCount++;
 	int x = target->PatternFrameCount;
 	if (x < 30) {
@@ -91,10 +106,13 @@ void Pattern02(Unit *target) {
 	if (x > 230) {
 		target->Health = 0;
 	}
+
+	if (x%60 == 0)
+		Shoot(target);
 }
 // movement pattern #3
 // moves horizontally left and disappears
-void Pattern03(Unit *target) {
+void GameEntity::Pattern03(Unit *target) {
 	target->PatternFrameCount++;
 	int x = target->PatternFrameCount;
 	if (x < 160) {
@@ -103,6 +121,9 @@ void Pattern03(Unit *target) {
 	if (x > 160) {
 		target->Health = 0;
 	}
+
+	if (x%60 == 0)
+		Shoot(target);
 }
 // movement pattern #4
 // moves horizontally right and disappears
@@ -142,15 +163,16 @@ void GameEntity::ProcessProjectile(Projectile *proj) {
 			for (int i = 0; i < 100; i++) {
 				if (EnemyAlive[i]) {
 					if (IntersectionProjectile(Enemies[i], proj)) {
-						printf("intersection = true");
+						//printf("intersection = true");
 						proj->ProjType->OnHit(i, proj->Id);
 					}
 				}
 			}
 		} else {
-			if (IntersectionProjectile(Hero, proj)) {
-				proj->ProjType->OnHit(-1, proj->Id);
-			}
+			if (Hero->Health > 0)
+				if (IntersectionProjectile(Hero, proj)) {
+					proj->ProjType->OnHit(0, proj->Id);
+				}
 		}
 	}
 	// draw at screen
@@ -158,7 +180,7 @@ void GameEntity::ProcessProjectile(Projectile *proj) {
 }
 //===============================================================================
 void GameEntity::Shoot(Unit *unit) {
-	if (unit->CurrentCooldown <= 0) {
+	if (unit->CurrentCooldown <= 0 && unit->Health > 0) {
 		BulletCount++;
 		if (BulletCount >= 30)
 			BulletCount = 1;
@@ -171,8 +193,22 @@ void GameEntity::Shoot(Unit *unit) {
 			Bullet[BulletCount]->Player = true;
 			unit->CurrentCooldown = unit->Cooldown;
 			Bullet[BulletCount]->Id = BulletCount;
-			//if (Sprites[shtcnt*5+animation] != nullptr) 
-			//SetAnimation(1);
+		}
+		if (unit->BulletType == BulletType[1]) {
+			trigger = &Exp02;
+			ang = 90.0;
+			Bullet[BulletCount] = new Projectile(unit->BulletType, (int)unit->x+16, (int)unit->y+55, ang);
+			Bullet[BulletCount]->Player = false;
+			unit->CurrentCooldown = unit->Cooldown;
+			Bullet[BulletCount]->Id = BulletCount;
+		}
+		if (unit->BulletType == BulletType[2]) {
+			trigger = &Exp02;
+			ang = 80.0;
+			Bullet[BulletCount] = new Projectile(unit->BulletType, (int)unit->x+33, (int)unit->y+35, ang);
+			Bullet[BulletCount]->Player = false;
+			unit->CurrentCooldown = unit->Cooldown;
+			Bullet[BulletCount]->Id = BulletCount;
 		}
 	}
 }
@@ -351,13 +387,13 @@ bool GameEntity::GenerateProjectileTypes() {
 	BulletType[i] = new ProjectileType(1, 5.25, 0.3, 1, 1);
 	BulletType[i]->GenerateCount = 1;
 	BulletType[i]->AngleSeparate = 0.0;
-	BulletType[i]->OnHit = &Exp01;
+	BulletType[i]->OnHit = &Exp02;
 
 	i++;
 	BulletType[i] = new ProjectileType(1, 6.00, 0.4, 2, 1);
 	BulletType[i]->GenerateCount = 1;
 	BulletType[i]->AngleSeparate = 0.0;
-	BulletType[i]->OnHit = &Exp01;
+	BulletType[i]->OnHit = &Exp02;
 	return true;
 }
 
@@ -422,22 +458,65 @@ void GameEntity::NewGame() {
 	// create enemy
 	for (int i = 0; i < 100; i++)
 		EnemyAlive[i] = false;
+}
 
-	Enemies[0] = new Unit(0, 1, 0, 0, 4, 0);
-	Enemies[0]->Id = 0;
-	Enemies[0]->IsEnemy = true;
-	Enemies[0]->BulletType = BulletType[1];
-	Enemies[0]->VelocityMax = 2.5;
-	Enemies[0]->PatternNumber = 0;
-	EnemyAlive[0] = true;
+void GameEntity::AddEnemy1(int x, int y, int pattern) {
+	EnemyCount++;
+	if (EnemyCount > 99)
+		EnemyCount = 0;
+	Enemies[EnemyCount] = new Unit(0, 1, x, y, 4, 0);
+	Enemies[EnemyCount]->Id = EnemyCount;
+	Enemies[EnemyCount]->IsEnemy = true;
+	Enemies[EnemyCount]->BulletType = BulletType[1];
+	Enemies[EnemyCount]->VelocityMax = 2.5;
+	Enemies[EnemyCount]->PatternNumber = pattern;
+	EnemyAlive[EnemyCount] = true;
+}
 
-	Enemies[1] = new Unit(0, 2, 640, 135, 4, 0);
-	Enemies[1]->Id = 1;
-	Enemies[1]->IsEnemy = true;
-	Enemies[1]->BulletType = BulletType[1];
-	Enemies[1]->VelocityMax = 2.5;
-	Enemies[1]->PatternNumber = 1;
-	EnemyAlive[1] = true;
+void GameEntity::AddEnemy2(int x, int y, int pattern) {
+	EnemyCount++;
+	if (EnemyCount > 99)
+		EnemyCount = 0;
+	Enemies[EnemyCount] = new Unit(0, 2, x, y, 4, 0);
+	Enemies[EnemyCount]->Id = EnemyCount;
+	Enemies[EnemyCount]->IsEnemy = true;
+	Enemies[EnemyCount]->BulletType = BulletType[2];
+	Enemies[EnemyCount]->VelocityMax = 2.5;
+	Enemies[EnemyCount]->PatternNumber = pattern;
+	EnemyAlive[EnemyCount] = true;
+}
+
+
+void GameEntity::EnemySpawn(int timer) {
+	if (timer == 100) {
+		AddEnemy1(0, 0, 0);
+		AddEnemy1(640, 100, 1);
+	}
+	if (timer == 110) {
+		AddEnemy1(0, 150, 0);
+		AddEnemy1(640, 250, 1);
+	}
+
+	if (timer == 220)
+		AddEnemy2(0, 100, 0);
+	if (timer == 230)
+		AddEnemy2(0, 100, 0);
+	if (timer == 240)
+		AddEnemy2(0, 100, 0);
+	if (timer == 250)
+		AddEnemy2(0, 100, 0);
+	if (timer == 300)
+		AddEnemy2(640, 50, 1);
+	if (timer == 310)
+		AddEnemy2(640, 50, 1);
+	if (timer == 320)
+		AddEnemy2(640, 50, 1);
+	if (timer == 330)
+		AddEnemy2(640, 50, 1);
+	if (timer == 340)
+		AddEnemy2(640, 50, 1);
+
+
 }
 
 
@@ -504,7 +583,8 @@ int GameEntity::InitGame(void *data) {
 		if (Hero->Health > 0)
 			ProcessUnit(Hero);
 		// --- enemy units
-
+		SpawnTimer++;
+		EnemySpawn(SpawnTimer);
 		for (int i = 0; i < 100; i++) {
 			if (EnemyAlive[i]) {
 				if (Enemies[i]->Health > 0) {

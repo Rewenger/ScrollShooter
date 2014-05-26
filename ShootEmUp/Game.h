@@ -51,6 +51,7 @@ public:
 
 	static int BulletCount;
 	static int FxCount;
+	static int SpawnTimer;
 	static Projectile *Bullet[100];
 	static ProjectileType *BulletType[10];
 	static SpriteData *BulletData[100];
@@ -81,9 +82,18 @@ public:
 	static void ProcessProjectile(Projectile *proj);
 	static bool IntersectionUnits(Unit *unit1, Unit *unit2);
 	static bool IntersectionProjectile(Unit *unit, Projectile *proj);
+	// patterns
 	static Type_PatternFunc PatternFunc[10];
+	static void Pattern01(Unit *target);
+	static void Pattern02(Unit *target);
+	static void Pattern03(Unit *target);
+	static void EnemySpawn(int timer);
+	static void AddEnemy1(int x, int y, int pattern);
+	static void AddEnemy2(int x, int y, int pattern);
+	static int EnemyCount;
 	// ================= Projectile explosions ===================
 	static void Exp01(int target, int bullet);
+	static void Exp02(int target, int bullet);
 	// ================= Special FX ==============================
 	static void CreateExplosion(int x, int y, int type);
 };

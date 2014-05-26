@@ -60,6 +60,8 @@ Projectile::Projectile(ProjectileType *type, int PosX, int PosY, double ang) {
 	//AnimationMax = type->SpriteEnd-type->SpriteStart;
 	Player = false;
 	curVel = ProjType->Velocity;
+	width = PROJ_WIDTH;
+	height = PROJ_HEIGHT;
 }
 bool Projectile::Fly() {
 	x += curVel*cos(angle*CONST_PI); 
