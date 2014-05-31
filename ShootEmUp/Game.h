@@ -48,6 +48,7 @@ public:
 	static Unit *Hero;
 	static Unit *Enemies[100];
 	static bool EnemyAlive[100];
+	static bool Victory;
 
 	static int BulletCount;
 	static int FxCount;
@@ -63,6 +64,7 @@ public:
 	static SDL_Rect CharClips[100];
 	static Mix_Music *BGM1;
 	static Mix_Chunk *SFX[100];
+	static int BossNumber;
 	// =============== Game initialization functions ================
 	static int InitGame(void *data);
 	static void NewGame();
@@ -87,13 +89,21 @@ public:
 	static void Pattern01(Unit *target);
 	static void Pattern02(Unit *target);
 	static void Pattern03(Unit *target);
+	static void Pattern04(Unit *target);
+	static void Pattern05(Unit *target);
+	static void Pattern06(Unit *target);
+	static void Pattern07(Unit *target);
 	static void EnemySpawn(int timer);
 	static void AddEnemy1(int x, int y, int pattern);
 	static void AddEnemy2(int x, int y, int pattern);
+	static void AddEnemy3(int x, int y, int pattern);
 	static int EnemyCount;
+	static void WinGame(int timer);
 	// ================= Projectile explosions ===================
 	static void Exp01(int target, int bullet);
 	static void Exp02(int target, int bullet);
+	static void Exp03(int target, int bullet);
+	static void Exp04(int target, int bullet);
 	// ================= Special FX ==============================
 	static void CreateExplosion(int x, int y, int type);
 };

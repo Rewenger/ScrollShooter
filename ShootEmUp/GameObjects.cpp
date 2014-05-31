@@ -26,17 +26,21 @@ GameObject::GameObject(int DataImageNumber, int PosX, int PosY, int hp) {
 
 void GameObject::Move() {
 	x+= xVelocity; 
-	if (x < 0) {
-		x = 0;
-	} else if (x + width > SCREEN_WIDTH) {
-		x = SCREEN_WIDTH - width;
+	if (!CollisionIgnore) {
+		if (x < 0) {
+			x = 0;
+		} else if (x + width > SCREEN_WIDTH) {
+			x = SCREEN_WIDTH - width;
+		}
 	}
 
 	y += yVelocity; 
-	if (y < 0) {
-		y = 0;
-	} else if (y + height > SCREEN_HEIGHT) {
-		y = SCREEN_HEIGHT - height;
+	if (!CollisionIgnore) {
+		if (y < 0) {
+			y = 0;
+		} else if (y + height > SCREEN_HEIGHT) {
+			y = SCREEN_HEIGHT - height;
+		}
 	}
 }
 //===============================================================================

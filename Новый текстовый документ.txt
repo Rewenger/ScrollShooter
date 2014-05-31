@@ -1,2 +1,5 @@
-test jenkins once again!
-and again
+cd D:\ShootEmUp unit testing
+
+c:\windows\microsoft.net\framework\v4.0.30319\msbuild.exe /p:Configuration=Release
+
+c:\windows\microsoft.net\framework\v4.0.30319\msbuild.exe /p:Configuration=Test
