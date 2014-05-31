@@ -3,6 +3,7 @@
 //unsigned char test::X = 1;
 bool GameEntity::EndGame = false;
 bool GameEntity::Victory = false;
+bool GameEntity::Defeat = false;
 int GameEntity::bgScroll = 0;
 int GameEntity::BulletCount = 0;
 int GameEntity::FxCount = 0;
@@ -18,6 +19,8 @@ SDL_Surface *GameEntity::Sprites[100];
 SDL_Surface *GameEntity::HpBar;
 SDL_Surface *GameEntity::EnergyBar;
 SDL_Surface *GameEntity::GrayBar;
+SDL_Surface *GameEntity::VictoryScreen;
+SDL_Surface *GameEntity::DefeatScreen;
 
 Unit *GameEntity::Hero;
 Unit *GameEntity::Enemies[100];
@@ -32,7 +35,9 @@ SpriteData *GameEntity::FxData[100];
 SpriteData *GameEntity::BulletData[100];
 SDL_Rect GameEntity::CharClips[100];
 Mix_Music *GameEntity::BGM1;
-Mix_Chunk *GameEntity::SFX[100];
+Mix_Music *GameEntity::BGM2;
+Mix_Music *GameEntity::BGM3;
+Mix_Chunk *GameEntity::SFX[10];
 //===============================================================================
 // check whether unit intersects with another unit
 bool GameEntity::IntersectionUnits(Unit *unit1, Unit *unit2) {
@@ -51,6 +56,8 @@ bool GameEntity::IntersectionProjectile(Unit *unit, Projectile *proj) {
 }
 // explosion of bullet #1 - hero bullet
 void GameEntity::Exp01(int target, int bullet) {
+	if (Defeat)
+		return;
 	Enemies[target]->Damage(Bullet[bullet]->ProjType->Damage);
 	if (Enemies[target]->Health <= 0) {
 		if (target != BossNumber) {
@@ -66,27 +73,39 @@ void GameEntity::Exp01(int target, int bullet) {
 }
 // explosion of bullet #2 - enemy basic bullet
 void GameEntity::Exp02(int target, int bullet) {
+	if (Victory)
+		return;
 	Hero->Damage(Bullet[bullet]->ProjType->Damage);
 	if (Hero->Health <= 0) {
 		CreateExplosion(Hero->x-100, Hero->y-100, 3);
+		Defeat = true;
+		SpawnTimer = 0;
 	}
 	Bullet[bullet]->Health--;
 	CreateExplosion(Bullet[bullet]->x-100, Bullet[bullet]->y-100, 2);
 }
 // explosion of bullet #3 - boss basic bullet
 void GameEntity::Exp03(int target, int bullet) {
+	if (Victory)
+		return;
 	Hero->Damage(Bullet[bullet]->ProjType->Damage);
 	if (Hero->Health <= 0) {
 		CreateExplosion(Hero->x-100, Hero->y-100, 3);
+		Defeat = true;
+		SpawnTimer = 0;
 	}
 	Bullet[bullet]->Health--;
 	CreateExplosion(Bullet[bullet]->x-100, Bullet[bullet]->y-100, 3);
 }
 // explosion of bullet #4 - boss advanced bullet
 void GameEntity::Exp04(int target, int bullet) {
+	if (Victory)
+		return;
 	Hero->Damage(Bullet[bullet]->ProjType->Damage);
 	if (Hero->Health <= 0) {
 		CreateExplosion(Hero->x-100, Hero->y-100, 3);
+		Defeat = true;
+		SpawnTimer = 0;
 	}
 	Bullet[bullet]->Health--;
 	CreateExplosion(Bullet[bullet]->x-50, Bullet[bullet]->y-50, 4);
@@ -215,7 +234,7 @@ void GameEntity::WinGame(int timer) {
 	} else if ((timer < 300)&&(timer%5 == 0)&&(timer > 150)) {
 		ex = rand()%150, ey = rand()%175;
 		CreateExplosion(Enemies[BossNumber]->x-ex, Enemies[BossNumber]->y-ey, 5);
-	} else if ((timer == 300)&&(timer != 0)) {
+	} else if (timer == 300) {
 		for (int i = 0; i < 9; i++) {
 			ex = rand()%250-75, ey = rand()%250-75;
 			CreateExplosion(Enemies[BossNumber]->x-ex, Enemies[BossNumber]->y-ey, 5);
@@ -223,7 +242,16 @@ void GameEntity::WinGame(int timer) {
 		delete Enemies[BossNumber];
 		Enemies[BossNumber] = nullptr;
 		EnemyAlive[BossNumber] = false;
+		Mix_PlayMusic( BGM2, -1 );
+	} else if (timer > 300) {
+		apply_surface(100, 75, VictoryScreen, Screen);
 	}
+}
+
+void GameEntity::LoseGame(int timer) {
+	if (timer == 1)
+		Mix_PlayMusic( BGM3, -1 );
+	apply_surface(100, 75, DefeatScreen, Screen);
 }
 //===============================================================================
 
@@ -415,6 +443,10 @@ bool GameEntity::PreloadImages() {
 	if ( EnergyBar == NULL ) return false;
 	GrayBar = load_image("Data/BarGrayed.png");
 	if ( GrayBar == NULL ) return false;
+	VictoryScreen = load_image(LanguageFolder+"/Victory.png");
+	if ( VictoryScreen == NULL ) return false;
+	DefeatScreen = load_image(LanguageFolder+"/Defeat.png");
+	if ( DefeatScreen == NULL ) return false;
 
 	// main sprite sheet
 	Sprites[0] = load_image( "Sprites/SpriteSheet.png" );
@@ -448,6 +480,14 @@ bool GameEntity::PreloadMusic() {
 	BGM1 = NULL;
 	BGM1 = Mix_LoadMUS("BGM/Main.ogg" ); 
 	if (BGM1 == NULL) return false;
+
+	BGM2 = NULL;
+	BGM2 = Mix_LoadMUS("BGM/Fanfare.ogg" ); 
+	if (BGM2 == NULL) return false;
+
+	BGM3 = NULL;
+	BGM3 = Mix_LoadMUS("BGM/Defeat.ogg" ); 
+	if (BGM3 == NULL) return false;
 
 	SFX[0] = NULL;
 	SFX[0] = Mix_LoadWAV( "SFX/anvil.wav" );
@@ -815,8 +855,8 @@ int GameEntity::InitGame(void *data) {
 		// --- hero
 		if (Hero->Health > 0)
 			HandleButtonHold();
-
-		Hero->Move();
+		if (!Victory && !Defeat)
+			Hero->Move();
 
 		if (Hero->CurrentCooldown > 0)
 			Hero->CurrentCooldown--;
@@ -824,16 +864,11 @@ int GameEntity::InitGame(void *data) {
 			ProcessUnit(Hero);
 		// --- enemy units
 		SpawnTimer++;
-		if (!Victory) {
-			EnemySpawn(SpawnTimer);
-		} else {
-			WinGame(SpawnTimer);
-		}
 		for (int i = 0; i < 100; i++) {
 			if (EnemyAlive[i]) {
 				if (Enemies[i]->Health > 0) {
 					ProcessUnit(Enemies[i]);
-					if (!Victory) {
+					if (!Victory && !Defeat) {
 						Enemies[i]->Move();
 						PatternFunc[Enemies[i]->PatternNumber](Enemies[i]);
 					}
@@ -868,6 +903,15 @@ int GameEntity::InitGame(void *data) {
 				}
 			}
 		}
+		// victory/defeat/enemyspawn
+		if (Victory) {
+			WinGame(SpawnTimer);
+		} else if (Defeat) {
+			LoseGame(SpawnTimer);
+		} else {
+			EnemySpawn(SpawnTimer);
+		}
+
 		// --- Overlay
 		GenerateOverlay();
 		// --- Update the screen

@@ -44,11 +44,14 @@ public:
 	static SDL_Surface *HpBar;
 	static SDL_Surface *EnergyBar;
 	static SDL_Surface *GrayBar;
+	static SDL_Surface *VictoryScreen;
+	static SDL_Surface *DefeatScreen;
 	
 	static Unit *Hero;
 	static Unit *Enemies[100];
 	static bool EnemyAlive[100];
 	static bool Victory;
+	static bool Defeat;
 
 	static int BulletCount;
 	static int FxCount;
@@ -63,7 +66,9 @@ public:
 	static SDL_Surface *Sprites[100];
 	static SDL_Rect CharClips[100];
 	static Mix_Music *BGM1;
-	static Mix_Chunk *SFX[100];
+	static Mix_Music *BGM2;
+	static Mix_Music *BGM3;
+	static Mix_Chunk *SFX[10];
 	static int BossNumber;
 	// =============== Game initialization functions ================
 	static int InitGame(void *data);
@@ -99,6 +104,7 @@ public:
 	static void AddEnemy3(int x, int y, int pattern);
 	static int EnemyCount;
 	static void WinGame(int timer);
+	static void LoseGame(int timer);
 	// ================= Projectile explosions ===================
 	static void Exp01(int target, int bullet);
 	static void Exp02(int target, int bullet);

@@ -26,7 +26,7 @@ bool init() {
 	if (Mix_Init(MIX_INIT_OGG) == 0) 
 		return false;
 
-    SDL_WM_SetCaption( "Scrollshooter 0.01", NULL );
+    SDL_WM_SetCaption( "Scrollshooter v.1.00", NULL );
 
 	// load configuration file
 	MUSIC_VOLUME = 5;
