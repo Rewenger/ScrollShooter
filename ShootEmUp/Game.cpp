@@ -4,12 +4,17 @@
 bool GameEntity::EndGame = false;
 bool GameEntity::Victory = false;
 bool GameEntity::Defeat = false;
+bool GameEntity::KEYHOLD_SHIFT = false;
 int GameEntity::bgScroll = 0;
 int GameEntity::BulletCount = 0;
 int GameEntity::FxCount = 0;
 int GameEntity::SpawnTimer = 0;
 int GameEntity::EnemyCount = 0;
 int GameEntity::BossNumber;
+int GameEntity::Score = 0;
+bool GameEntity::STATE_Pause = false;
+std::string GameEntity::PlayerName = "";
+std::stringstream GameEntity::TextStream;
 SDL_Thread *GameEntity::Thread = NULL;
 SDL_Surface *GameEntity::Screen = NULL;
 SDL_Surface *GameEntity::LoadScreenBG = NULL;
@@ -21,6 +26,10 @@ SDL_Surface *GameEntity::EnergyBar;
 SDL_Surface *GameEntity::GrayBar;
 SDL_Surface *GameEntity::VictoryScreen;
 SDL_Surface *GameEntity::DefeatScreen;
+SDL_Surface *GameEntity::ScoreSurface;
+TTF_Font *GameEntity::FNT_Forte = NULL;
+SDL_Color GameEntity::FNT_WhiteColor = { 255, 255, 255 };
+SDL_Color GameEntity::FNT_BlackColor = { 0, 0, 0 };
 
 Unit *GameEntity::Hero;
 Unit *GameEntity::Enemies[100];
@@ -62,10 +71,13 @@ void GameEntity::Exp01(int target, int bullet) {
 	if (Enemies[target]->Health <= 0) {
 		if (target != BossNumber) {
 			CreateExplosion(Enemies[target]->x-100, Enemies[target]->y-100, 3);
+			Score++;
 		} else {
 			Enemies[target]->Health = 9999;
 			SpawnTimer = 0;
 			Victory = true;
+			Score+=20;
+			STATE_Pause = true;
 		}
 	}
 	Bullet[bullet]->Health--;
@@ -244,6 +256,7 @@ void GameEntity::WinGame(int timer) {
 		EnemyAlive[BossNumber] = false;
 		Mix_PlayMusic( BGM2, -1 );
 	} else if (timer > 300) {
+		STATE_Pause = false;
 		apply_surface(100, 75, VictoryScreen, Screen);
 	}
 }
@@ -389,8 +402,29 @@ void GameEntity::HandleButtonPress(int key) {
 		case BUTTON_ULTI: 
 			//SDL_Thread *thread = SDL_CreateThread( Ultimate, nullptr );
 			break;
+		default:
+			break;
     }
-
+	if (Victory || Defeat) {
+		if (STATE_Pause)
+			return;
+		char sym;
+		if (key >= SDLK_0 && key <= SDLK_9 && PlayerName.length() <= 12) {
+			if (!KEYHOLD_SHIFT)
+				sym = 0x30+(key-SDLK_0);
+			else
+				sym = 0x20+(key-SDLK_0);
+			PlayerName+=sym;
+		} else if (key >= SDLK_a && key <= SDLK_z && PlayerName.length() <= 12) {
+			if (!KEYHOLD_SHIFT)
+				sym = 0x61+(key-SDLK_a);
+			else
+				sym = 0x41+(key-SDLK_a);
+			PlayerName+=sym;
+		} else if (key == SDLK_BACKSPACE) {
+			PlayerName = PlayerName.substr(0, PlayerName.length() - 1);
+		}
+	}
 }
 
 void GameEntity::HandleButtonHold() {
@@ -400,6 +434,12 @@ void GameEntity::HandleButtonHold() {
 		 up		= false, 
 		 down	= false;
 
+	if (keystates[SDLK_RSHIFT] || keystates[SDLK_LSHIFT])
+		KEYHOLD_SHIFT = true;
+	else
+		KEYHOLD_SHIFT = false;
+	if (Hero->Health < 0)
+		return;
 	if ((keystates[ BUTTON_RIGHT ])||(keystates[ SDLK_RIGHT])) {
 		right = true;
 		printf("right!\n");
@@ -619,6 +659,22 @@ void GameEntity::GenerateOverlay() {
 	apply_surface(SCREEN_WIDTH+4, 191, HpBar, Screen, clipHp);
 	apply_surface(SCREEN_WIDTH+4, 363, EnergyBar, Screen, clipEnergy);
 	apply_surface(SCREEN_WIDTH-5, 0, InterfaceOverlay, Screen);
+	// draw score value
+	TextStream.str(std::string());
+	TextStream.clear();
+	TextStream << Score;
+	ScoreSurface = TTF_RenderText_Solid(FNT_Forte, TextStream.str().c_str(),  FNT_WhiteColor);
+	apply_surface(SCREEN_WIDTH+55, 490, ScoreSurface, Screen );
+	SDL_FreeSurface(ScoreSurface);
+	// if victory or defeat, draws player name he was typing
+	if (Victory || Defeat) {
+		TextStream.str(std::string());
+		TextStream.clear();
+		TextStream << PlayerName;
+		ScoreSurface = TTF_RenderText_Solid(FNT_Forte, TextStream.str().c_str(),  FNT_BlackColor);
+		apply_surface(220, 375, ScoreSurface, Screen );
+		SDL_FreeSurface(ScoreSurface);
+	}
 }
 
 void GameEntity::ApplyBackground() {
@@ -711,7 +767,7 @@ void GameEntity::AddEnemy3(int x, int y, int pattern) {
 
 void GameEntity::EnemySpawn(int timer) {
 	// first wave - 4 type-A
-/*	if (timer == 100) { 
+	if (timer == 100) { 
 		AddEnemy1(0, 0, 0);
 		AddEnemy1(640, 100, 1);
 		return;
@@ -721,7 +777,7 @@ void GameEntity::EnemySpawn(int timer) {
 		AddEnemy1(640, 250, 1);
 		return;
 	}
-
+	
 	// second wave - 4 pairs of type-B
 	if (timer == 400)
 		AddEnemy2(0, 0, 4);
@@ -792,10 +848,10 @@ void GameEntity::EnemySpawn(int timer) {
 	if (timer == 1280)
 		AddEnemy2(0, 90, 4);
 	if (timer == 1300)
-		AddEnemy2(640, 90, 5);*/
+		AddEnemy2(640, 90, 5);
 
-	// fifth wave - three type-C ships
-	if (timer == 100)
+	// fifth wave - boss
+	if (timer == 1500)
 		AddEnemy3(300, -100, 6);
 }
 
@@ -803,6 +859,7 @@ void GameEntity::EnemySpawn(int timer) {
 int GameEntity::InitGame(void *data) {
 	printf("Init started!\n");
 	EndGame = false;
+	FNT_Forte = TTF_OpenFont("Data/FORTE.TTF", 34);
 
 	// stop menu music
 	Mix_HaltMusic(); 
@@ -853,8 +910,8 @@ int GameEntity::InitGame(void *data) {
 		fps.start();
 		ApplyBackground();
 		// --- hero
-		if (Hero->Health > 0)
-			HandleButtonHold();
+		
+		HandleButtonHold();
 		if (!Victory && !Defeat)
 			Hero->Move();
 

@@ -231,8 +231,6 @@ int SubStartGame(void *data) {
 //=====================================================================================================================
 int CreateLeaderboard() {
 	int count = -1;
-	Leaderboard *lb;
-
 	 char cCurrentPath[FILENAME_MAX];
 	 if (!_getcwd(cCurrentPath, sizeof(cCurrentPath)))
 		return errno;
@@ -240,7 +238,7 @@ int CreateLeaderboard() {
 	cCurrentPath[sizeof(cCurrentPath) - 1] = '\0';
 
 	strcat(cCurrentPath, "\\records.ini");
-	lb = new Leaderboard(cCurrentPath, LB_SIZE);
+	Leaderboard *lb = new Leaderboard(cCurrentPath, LB_SIZE);
 	printf(cCurrentPath);
 	lb->Update();
 
@@ -475,13 +473,13 @@ int main( int argc, char* args[] ) {
 			}
 			// Handle single button press
 			if( ExitLoop.type == SDL_KEYDOWN ) {
-				if ((ExitLoop.key.keysym.sym == BUTTON_SHOOT)||(ExitLoop.key.keysym.sym == BUTTON_ULTI)||(ExitLoop.key.keysym.sym == BUTTON_QUIT) ) {
+				//if ((ExitLoop.key.keysym.sym == BUTTON_SHOOT)||(ExitLoop.key.keysym.sym == BUTTON_ULTI)||(ExitLoop.key.keysym.sym == BUTTON_QUIT) ) {
 					game->HandleButtonPress(ExitLoop.key.keysym.sym);
 					if (ExitLoop.key.keysym.sym == BUTTON_QUIT) {
 						GameQuit = true;
 						break;
 					}
-				}
+			//	}
 			}
 
 			if (ExitLoop.type == SDL_QUIT ) {
@@ -490,6 +488,40 @@ int main( int argc, char* args[] ) {
 			}
 		}
 	}
+	// if the game was finished, save the leaderboard
+	if (game->Victory || game->Defeat) {
+		char cCurrentPath[FILENAME_MAX];
+		if (!_getcwd(cCurrentPath, sizeof(cCurrentPath)))
+			return errno;
+		cCurrentPath[sizeof(cCurrentPath) - 1] = '\0';
+		strcat(cCurrentPath, "\\records.ini");
+		Leaderboard *lb = new Leaderboard(cCurrentPath, LB_SIZE);
+		lb->Update();
+
+		std::string name = game->PlayerName;
+		int GameScore = game->Score;
+		int GameLives = game->Hero->Health;
+		int pos = 0;
+		for (int i = lb->recordcount; i >= 0; i--) {
+			if (lb->StatValue[i-1][0] <= GameScore)
+				pos = i;
+		}
+		if (GameScore >= lb->StatValue[lb->recordcount-1][0]) {
+			for (int i = lb->recordcount-1; i > pos; i--) {
+				lb->StatValue[i][0] = lb->StatValue[i-1][0];
+				lb->StatValue[i][1] = lb->StatValue[i-1][1];
+				lb->PlayerName[i] = lb->PlayerName[i-1];
+			}
+			lb->StatValue[pos][0] = GameScore;
+			lb->StatValue[pos][1] = GameLives;
+			char *y = new char[name.length() + 1];
+			std::strcpy(y, name.c_str());
+			lb->PlayerName[pos] = y;
+			lb->Save();
+		}
+	}
+	//
+
 	game->EndGame = true;
 	clean_up();
     return 0;

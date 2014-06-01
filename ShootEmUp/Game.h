@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
+#include <sstream>
 #include "Imagework.h"
 #include "Timer.h"
 #include "GameObjects.h"
@@ -70,6 +71,15 @@ public:
 	static Mix_Music *BGM3;
 	static Mix_Chunk *SFX[10];
 	static int BossNumber;
+	static int Score;
+	static std::stringstream TextStream;
+	static SDL_Surface *ScoreSurface;
+	static TTF_Font *FNT_Forte;
+	static SDL_Color FNT_WhiteColor;
+	static SDL_Color FNT_BlackColor;
+	static std::string PlayerName;
+	static bool KEYHOLD_SHIFT;
+	static bool STATE_Pause;
 	// =============== Game initialization functions ================
 	static int InitGame(void *data);
 	static void NewGame();
