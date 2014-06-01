@@ -506,7 +506,7 @@ int main( int argc, char* args[] ) {
 			if (lb->StatValue[i-1][0] <= GameScore)
 				pos = i;
 		}
-		if (GameScore >= lb->StatValue[lb->recordcount-1][0]) {
+		if (GameScore >= lb->StatValue[lb->recordcount-1][0] && name != "") {
 			for (int i = lb->recordcount-1; i > pos; i--) {
 				lb->StatValue[i][0] = lb->StatValue[i-1][0];
 				lb->StatValue[i][1] = lb->StatValue[i-1][1];

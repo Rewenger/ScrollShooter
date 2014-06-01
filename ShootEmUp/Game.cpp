@@ -171,7 +171,7 @@ void GameEntity::Pattern03(Unit *target) {
 		target->Health = 0;
 	}
 
-	if (x%60 == 0)
+	if (x%35 == 0)
 		Shoot(target);
 }
 // movement pattern #4
@@ -184,7 +184,7 @@ void GameEntity::Pattern04(Unit *target) {
 	} else if (x > 160) {
 		target->Health = 0;
 	}
-	if (x%60 == 0)
+	if (x%35 == 0)
 		Shoot(target);
 }
 
@@ -713,7 +713,7 @@ void GameEntity::NewGame() {
 	Hero->Id = -1;
 	Hero->IsEnemy = false;
 	Hero->BulletType = BulletType[0];
-	Hero->Charge = 10;
+	Hero->Charge = 0;
 	Hero->CollisionIgnore = false;
 
 	// create enemy
@@ -753,7 +753,7 @@ void GameEntity::AddEnemy3(int x, int y, int pattern) {
 	EnemyCount++;
 	if (EnemyCount > 99)
 		EnemyCount = 0;
-	Enemies[EnemyCount] = new Unit(0, 3, x, y, 20, 0);
+	Enemies[EnemyCount] = new Unit(0, 3, x, y, 100, 0);
 	Enemies[EnemyCount]->Id = EnemyCount;
 	Enemies[EnemyCount]->IsEnemy = true;
 	Enemies[EnemyCount]->BulletType = BulletType[3];
@@ -766,6 +766,10 @@ void GameEntity::AddEnemy3(int x, int y, int pattern) {
 
 
 void GameEntity::EnemySpawn(int timer) {
+	if (timer%30 == 0) {
+		if (Hero->Charge < 20)
+			Hero->Charge++;
+	}
 	// first wave - 4 type-A
 	if (timer == 100) { 
 		AddEnemy1(0, 0, 0);
@@ -850,9 +854,100 @@ void GameEntity::EnemySpawn(int timer) {
 	if (timer == 1300)
 		AddEnemy2(640, 90, 5);
 
-	// fifth wave - boss
-	if (timer == 1500)
+	// fifth wave - mix of type-A and type-B
+	if (timer == 1400) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+	if (timer == 1440) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+	if (timer == 1450)
+		AddEnemy2(0, 0, 3);
+	if (timer == 1460)
+		AddEnemy2(640, 0, 2);
+	if (timer == 1470)
+		AddEnemy2(0, 90, 4);
+	if (timer == 1480)
+		AddEnemy2(640, 90, 5);
+	if (timer == 1500) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+	if (timer == 1540) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+	if (timer == 1560)
+		AddEnemy2(0, 0, 3);
+	if (timer == 1570)
+		AddEnemy2(640, 0, 2);
+	if (timer == 1580)
+		AddEnemy2(0, 90, 4);
+	if (timer == 1590)
+		AddEnemy2(640, 90, 5);
+	if (timer == 1640) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+	if (timer == 1700) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+
+	// boss
+	if (timer == 1820)
 		AddEnemy3(300, -100, 6);
+	// boss adds
+	if (timer == 1900) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+	if (timer == 1950)
+		AddEnemy2(0, 0, 3);
+	if (timer == 1960)
+		AddEnemy2(640, 0, 2);
+	if (timer == 2000) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+	if (timer == 2080)
+		AddEnemy2(0, 90, 4);
+	if (timer == 2090)
+		AddEnemy2(640, 90, 5);
+	if (timer == 2100)
+		AddEnemy2(0, 0, 3);
+	if (timer == 2110)
+		AddEnemy2(640, 0, 2);
+	if (timer == 2200) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+	if (timer == 2250) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+	if (timer == 2300)
+		AddEnemy2(0, 90, 4);
+	if (timer == 2310)
+		AddEnemy2(640, 90, 5);
+	if (timer == 2320)
+		AddEnemy2(0, 0, 3);
+	if (timer == 2330)
+		AddEnemy2(640, 0, 2);
+	if (timer == 2400)
+		AddEnemy2(0, 90, 4);
+	if (timer == 2410)
+		AddEnemy2(640, 90, 5);
+	if (timer == 2320)
+		AddEnemy2(0, 0, 3);
+	if (timer == 2430)
+		AddEnemy2(640, 0, 2);
 }
 
 
