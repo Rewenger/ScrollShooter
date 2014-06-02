@@ -101,6 +101,7 @@ Unit::Unit(int DataImageNumber, int clip, int PosX, int PosY, int hp, int BltTyp
 	
 	temporary = false;
 	Cooldown = 0;
+	CurrentCooldown = 0;
 	IsEnemy = true;
 	PatternNumber = 0;
 	PatternFrameCount = 0;
