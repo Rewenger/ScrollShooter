@@ -12,6 +12,7 @@ int GameEntity::SpawnTimer = 0;
 int GameEntity::EnemyCount = 0;
 int GameEntity::BossNumber;
 int GameEntity::Score = 0;
+int GameEntity::ExplosionCount = -1;
 bool GameEntity::STATE_Pause = false;
 std::string GameEntity::PlayerName = "";
 std::stringstream GameEntity::TextStream;
@@ -158,6 +159,42 @@ void GameEntity::Exp05(int target, int bullet) {
 	CreateExplosion(Bullet[bullet]->x-125, Bullet[bullet]->y-75, 5);
 	CreateExplosion(Bullet[bullet]->x-75, Bullet[bullet]->y-125, 5);
 	CreateExplosion(Bullet[bullet]->x-125, Bullet[bullet]->y-125, 5);
+}
+
+void GameEntity::ExplosionWave(int count) {
+	if (Defeat) {
+		ExplosionCount = -1;
+		return;
+	}
+
+	if (count%5 == 0) {
+		int shift = -200;
+		for (int a = 0; a < 3; a++) {
+			shift+=100;
+			for (int i = 0; i < 100; i++) {
+				if (EnemyAlive[i]) {
+					if (IntersectionSquare(Enemies[i], Hero->x+shift-45, Hero->y-90-count*15, 170, 170)) {
+						Enemies[i]->Damage(3);
+						if (Enemies[i]->Health <= 0) {
+							if (i != BossNumber) {
+								CreateExplosion(Enemies[i]->x-100, Enemies[i]->y-100, 3);
+								Score++;
+							} else {
+								Enemies[i]->Health = 9999;
+								SpawnTimer = 0;
+								Victory = true;
+								Score+=20;
+								STATE_Pause = true;
+							}
+						}
+					}
+				}
+			}
+			CreateExplosion(Hero->x+shift-45, Hero->y-75-count*15, 5);
+		}
+	}
+	if (count >= 75)
+		ExplosionCount = -1;
 }
 
 
@@ -444,8 +481,8 @@ void GameEntity::HandleButtonPress(int key) {
 			EndGame = true;
 			break;
 		case BUTTON_ULTI1:
-			if (Hero->Charge >= 10) {
-				Hero->Charge-=10;
+			if (Hero->Charge >= 6) {
+				Hero->Charge-=6;
 				Hero->BulletType = BulletType[5];
 				Shoot(Hero);
 				Hero->BulletType = BulletType[0];
@@ -453,7 +490,10 @@ void GameEntity::HandleButtonPress(int key) {
 			//SDL_Thread *thread = SDL_CreateThread( Ultimate, nullptr );
 			break;
 		case BUTTON_ULTI2: 
-			//SDL_Thread *thread = SDL_CreateThread( Ultimate, nullptr );
+			if (Hero->Charge >= 20 && !Victory && !Defeat) {
+				Hero->Charge-=20;
+				ExplosionCount = 0;
+			}
 			break;
 		default:
 			break;
@@ -973,45 +1013,45 @@ void GameEntity::EnemySpawn(int timer) {
 		AddEnemy1(0, 200, 0);
 		AddEnemy1(640, 0, 1);
 	}
-	if (timer == 1950)
+	if (timer == 1980)
 		AddEnemy2(0, 0, 3);
-	if (timer == 1960)
+	if (timer == 2010)
 		AddEnemy2(640, 0, 2);
-	if (timer == 2000) {
+	if (timer == 2050) {
 		AddEnemy1(0, 200, 0);
 		AddEnemy1(640, 0, 1);
 	}
-	if (timer == 2080)
-		AddEnemy2(0, 90, 4);
-	if (timer == 2090)
-		AddEnemy2(640, 90, 5);
-	if (timer == 2100)
-		AddEnemy2(0, 0, 3);
 	if (timer == 2110)
-		AddEnemy2(640, 0, 2);
-	if (timer == 2200) {
-		AddEnemy1(0, 200, 0);
-		AddEnemy1(640, 0, 1);
-	}
-	if (timer == 2250) {
-		AddEnemy1(0, 200, 0);
-		AddEnemy1(640, 0, 1);
-	}
-	if (timer == 2300)
 		AddEnemy2(0, 90, 4);
-	if (timer == 2310)
+	if (timer == 2140)
 		AddEnemy2(640, 90, 5);
-	if (timer == 2320)
+	if (timer == 2170)
 		AddEnemy2(0, 0, 3);
-	if (timer == 2330)
+	if (timer == 2200)
 		AddEnemy2(640, 0, 2);
+	if (timer == 2230) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
+	if (timer == 2300) {
+		AddEnemy1(0, 200, 0);
+		AddEnemy1(640, 0, 1);
+	}
 	if (timer == 2400)
 		AddEnemy2(0, 90, 4);
-	if (timer == 2410)
-		AddEnemy2(640, 90, 5);
-	if (timer == 2320)
-		AddEnemy2(0, 0, 3);
 	if (timer == 2430)
+		AddEnemy2(640, 90, 5);
+	if (timer == 2460)
+		AddEnemy2(0, 0, 3);
+	if (timer == 2490)
+		AddEnemy2(640, 0, 2);
+	if (timer == 2520)
+		AddEnemy2(0, 90, 4);
+	if (timer == 2550)
+		AddEnemy2(640, 90, 5);
+	if (timer == 2580)
+		AddEnemy2(0, 0, 3);
+	if (timer == 2610)
 		AddEnemy2(640, 0, 2);
 }
 
@@ -1079,6 +1119,10 @@ int GameEntity::InitGame(void *data) {
 			Hero->CurrentCooldown--;
 		if (Hero->Health > 0)
 			ProcessUnit(Hero);
+		if (ExplosionCount > -1) {
+			ExplosionCount++;
+			ExplosionWave(ExplosionCount);
+		}
 		// --- enemy units
 		SpawnTimer++;
 		for (int i = 0; i < 100; i++) {
