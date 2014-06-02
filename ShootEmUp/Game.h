@@ -99,6 +99,7 @@ public:
 	static void ProcessProjectile(Projectile *proj);
 	static bool IntersectionUnits(Unit *unit1, Unit *unit2);
 	static bool IntersectionProjectile(Unit *unit, Projectile *proj);
+	static bool IntersectionSquare(Unit *unit, int x, int y, int w, int h);
 	// patterns
 	static Type_PatternFunc PatternFunc[10];
 	static void Pattern01(Unit *target);
@@ -120,6 +121,7 @@ public:
 	static void Exp02(int target, int bullet);
 	static void Exp03(int target, int bullet);
 	static void Exp04(int target, int bullet);
+	static void Exp05(int target, int bullet);
 	// ================= Special FX ==============================
 	static void CreateExplosion(int x, int y, int type);
 };

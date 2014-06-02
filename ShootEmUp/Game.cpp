@@ -56,6 +56,13 @@ bool GameEntity::IntersectionUnits(Unit *unit1, Unit *unit2) {
           unit2->y <= unit1->y+unit1->height);
 }
 
+bool GameEntity::IntersectionSquare(Unit *unit, int x, int y, int w, int h) {
+	return (unit->x <= x+w &&
+          x <= unit->x+unit->width &&
+          unit->y <= y+h &&
+          y <= unit->y+unit->height);
+}
+
 // check whether unit intersects with projectile
 bool GameEntity::IntersectionProjectile(Unit *unit, Projectile *proj) {
 		return (unit->x <= proj->x+proj->width &&
@@ -121,6 +128,36 @@ void GameEntity::Exp04(int target, int bullet) {
 	}
 	Bullet[bullet]->Health--;
 	CreateExplosion(Bullet[bullet]->x-50, Bullet[bullet]->y-50, 4);
+}
+// explosion of bullet #5 - hero special attack
+void GameEntity::Exp05(int target, int bullet) {
+	if (Defeat)
+		return;
+
+	for (int i = 0; i < 100; i++) {
+		if (EnemyAlive[i]) {
+			if (IntersectionSquare(Enemies[i], Bullet[bullet]->x-30, Bullet[bullet]->y-90, 170, 170)) {
+				Enemies[i]->Damage(Bullet[bullet]->ProjType->Damage);
+				if (Enemies[i]->Health <= 0) {
+					if (i != BossNumber) {
+						CreateExplosion(Enemies[i]->x-100, Enemies[i]->y-100, 3);
+						Score++;
+					} else {
+						Enemies[i]->Health = 9999;
+						SpawnTimer = 0;
+						Victory = true;
+						Score+=20;
+						STATE_Pause = true;
+					}
+				}
+			}
+		}
+	}
+	Bullet[bullet]->Health--;
+	CreateExplosion(Bullet[bullet]->x-75, Bullet[bullet]->y-75, 5);
+	CreateExplosion(Bullet[bullet]->x-125, Bullet[bullet]->y-75, 5);
+	CreateExplosion(Bullet[bullet]->x-75, Bullet[bullet]->y-125, 5);
+	CreateExplosion(Bullet[bullet]->x-125, Bullet[bullet]->y-125, 5);
 }
 
 
@@ -369,6 +406,14 @@ void GameEntity::Shoot(Unit *unit) {
 				Bullet[BulletCount]->Id = BulletCount;
 			}
 			return;
+		} else if (unit->BulletType == BulletType[5]) {
+			trigger = &Exp05;
+			ang = 270.0;
+			Bullet[BulletCount] = new Projectile(unit->BulletType, (int)unit->x+35, (int)unit->y, ang);
+			Bullet[BulletCount]->Player = true;
+			unit->CurrentCooldown = unit->Cooldown+5;
+			Bullet[BulletCount]->Id = BulletCount;
+			return;
 		}
 	}
 }
@@ -392,14 +437,22 @@ void GameEntity::CreateExplosion(int x, int y, int type) {
 void GameEntity::HandleButtonPress(int key) {
 	switch (key) {
 		case BUTTON_SHOOT: 
-			//Hero->Charge--;
 			if (Hero->Health > 0)
 				Shoot(Hero);
 			break;
 		case BUTTON_QUIT:
 			EndGame = true;
 			break;
-		case BUTTON_ULTI: 
+		case BUTTON_ULTI1:
+			if (Hero->Charge >= 10) {
+				Hero->Charge-=10;
+				Hero->BulletType = BulletType[5];
+				Shoot(Hero);
+				Hero->BulletType = BulletType[0];
+			}
+			//SDL_Thread *thread = SDL_CreateThread( Ultimate, nullptr );
+			break;
+		case BUTTON_ULTI2: 
 			//SDL_Thread *thread = SDL_CreateThread( Ultimate, nullptr );
 			break;
 		default:
@@ -502,6 +555,8 @@ bool GameEntity::PreloadImages() {
 	if ( Sprites[4] == NULL ) return false;
 	Sprites[5] = load_image( "Sprites/WeaponSheet5.png" );
 	if ( Sprites[5] == NULL ) return false;
+	Sprites[11] = load_image( "Sprites/WeaponSheet6.png" );
+	if ( Sprites[11] == NULL ) return false;
 	// sheets with an explosion animations
 	Sprites[6] = load_image( "Sprites/Explosion1.png" );
 	if ( Sprites[6] == NULL ) return false;
@@ -574,6 +629,10 @@ bool GameEntity::SpriteClips() {
 	BulletData[4] = new SpriteData;
 	BulletData[4]->SpriteSheet = 5;
 	BulletData[4]->Init(20, 20, 1, 5, 5);
+
+	BulletData[5] = new SpriteData;
+	BulletData[5]->SpriteSheet = 11;
+	BulletData[5]->Init(15, 30, 1, 5, 5);
 	// set clip rectangles for explosions
 	FxData[0] = new SpriteData;
 	FxData[0]->SpriteSheet = 6;
@@ -604,35 +663,41 @@ bool GameEntity::SpriteClips() {
 bool GameEntity::GenerateProjectileTypes() {
 	int i = -1;
 
-	i++;
+	i++; // 0 - hero basic
 	BulletType[i] = new ProjectileType(1, 6.75, 0.4, 0, 1);
 	BulletType[i]->GenerateCount = 1;
 	BulletType[i]->AngleSeparate = 0.0;
 	BulletType[i]->OnHit = &Exp01;
 
-	i++;
+	i++; // 1 - type-A basic
 	BulletType[i] = new ProjectileType(1, 5.25, 0.3, 1, 1);
 	BulletType[i]->GenerateCount = 1;
 	BulletType[i]->AngleSeparate = 0.0;
 	BulletType[i]->OnHit = &Exp02;
 
-	i++;
+	i++; // 2 - type-B basic
 	BulletType[i] = new ProjectileType(1, 6.00, 0.4, 2, 1);
 	BulletType[i]->GenerateCount = 1;
 	BulletType[i]->AngleSeparate = 0.0;
 	BulletType[i]->OnHit = &Exp02;
 
-	i++;
+	i++; // 3 - boss basic
 	BulletType[i] = new ProjectileType(2, 5.25, 0.5, 3, 1);
 	BulletType[i]->GenerateCount = 2;
 	BulletType[i]->AngleSeparate = 0.0;
 	BulletType[i]->OnHit = &Exp03;
 
-	i++;
+	i++; // 4 - boss advanced
 	BulletType[i] = new ProjectileType(2, 3.25, 0.2, 4, 1);
 	BulletType[i]->GenerateCount = 3;
 	BulletType[i]->AngleSeparate = 60.0;
 	BulletType[i]->OnHit = &Exp04;
+
+	i++; // 5 - special attack 1 bullet
+	BulletType[i] = new ProjectileType(3, 6.00, 0.4, 5, 1);
+	BulletType[i]->GenerateCount = 1;
+	BulletType[i]->AngleSeparate = 0.0;
+	BulletType[i]->OnHit = &Exp05;
 	return true;
 }
 
