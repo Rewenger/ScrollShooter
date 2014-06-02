@@ -122,6 +122,8 @@ public:
 	static void Exp03(int target, int bullet);
 	static void Exp04(int target, int bullet);
 	static void Exp05(int target, int bullet);
+	static void ExplosionWave(int count);
+	static int ExplosionCount;
 	// ================= Special FX ==============================
 	static void CreateExplosion(int x, int y, int type);
 };

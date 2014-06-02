@@ -61,7 +61,6 @@ bool init() {
 
 	Mix_VolumeMusic(10*MUSIC_VOLUME);
 	Mix_Volume(-1, 10*SFX_VOLUME);
-
     return true;
 }
 
@@ -241,11 +240,6 @@ int CreateLeaderboard() {
 	Leaderboard *lb = new Leaderboard(cCurrentPath, LB_SIZE);
 	printf(cCurrentPath);
 	lb->Update();
-
-/*	printf("Processing result!\n");
-	printf("return = %s \n", lb->PlayerName[0]);
-	printf("return = %d \n", lb->StatValue[0][0]);
-	printf("return = %d \n", lb->StatValue[0][1]);*/
 
 	char* ProcStr = new char[512];
 	char *tempstr = new char[512];

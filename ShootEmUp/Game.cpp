@@ -387,10 +387,8 @@ void GameEntity::Shoot(Unit *unit) {
 		BulletCount++;
 		if (BulletCount >= 30)
 			BulletCount = 1;
-		void (*trigger)(int TargetId, int ProjectileId);
 		double ang = 0.0;
 		if (unit->BulletType == BulletType[0]) {
-			trigger = &Exp01;
 			ang = 270.0;
 			Bullet[BulletCount] = new Projectile(unit->BulletType, (int)unit->x+35, (int)unit->y, ang);
 			Bullet[BulletCount]->Player = true;
@@ -398,7 +396,6 @@ void GameEntity::Shoot(Unit *unit) {
 			Bullet[BulletCount]->Id = BulletCount;
 			return;
 		} else if (unit->BulletType == BulletType[1]) {
-			trigger = &Exp02;
 			ang = 90.0;
 			Bullet[BulletCount] = new Projectile(unit->BulletType, (int)unit->x+16, (int)unit->y+55, ang);
 			Bullet[BulletCount]->Player = false;
@@ -406,7 +403,6 @@ void GameEntity::Shoot(Unit *unit) {
 			Bullet[BulletCount]->Id = BulletCount;
 			return;
 		} else if (unit->BulletType == BulletType[2]) {
-			trigger = &Exp02;
 			ang = 90.0;
 			Bullet[BulletCount] = new Projectile(unit->BulletType, (int)unit->x+33, (int)unit->y+35, ang);
 			Bullet[BulletCount]->Player = false;
@@ -414,7 +410,6 @@ void GameEntity::Shoot(Unit *unit) {
 			Bullet[BulletCount]->Id = BulletCount;
 			return;
 		} else if (unit->BulletType == BulletType[3]) {
-			trigger = &Exp02;
 			ang = 90.0;
 			Bullet[BulletCount] = new Projectile(unit->BulletType, (int)unit->x+36, (int)unit->y+110, ang);
 			Bullet[BulletCount]->Player = false;
@@ -430,7 +425,6 @@ void GameEntity::Shoot(Unit *unit) {
 			Bullet[BulletCount]->Id = BulletCount;
 			return;
 		} else if (unit->BulletType == BulletType[4]) {
-			trigger = &Exp04;
 			ang = 0.0;
 			for (int i = 0; i < 5; i++) {
 				ang+=30.0;
@@ -444,7 +438,6 @@ void GameEntity::Shoot(Unit *unit) {
 			}
 			return;
 		} else if (unit->BulletType == BulletType[5]) {
-			trigger = &Exp05;
 			ang = 270.0;
 			Bullet[BulletCount] = new Projectile(unit->BulletType, (int)unit->x+35, (int)unit->y, ang);
 			Bullet[BulletCount]->Player = true;
