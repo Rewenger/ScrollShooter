@@ -727,7 +727,7 @@ bool GameEntity::GenerateProjectileTypes() {
 	BulletType[i]->OnHit = &Exp04;
 
 	i++; // 5 - special attack 1 bullet
-	BulletType[i] = new ProjectileType(3, 6.00, 0.4, 5, 1);
+	BulletType[i] = new ProjectileType(10, 6.00, 0.4, 5, 1);
 	BulletType[i]->GenerateCount = 1;
 	BulletType[i]->AngleSeparate = 0.0;
 	BulletType[i]->OnHit = &Exp05;
@@ -856,7 +856,7 @@ void GameEntity::AddEnemy3(int x, int y, int pattern) {
 	EnemyCount++;
 	if (EnemyCount > 99)
 		EnemyCount = 0;
-	Enemies[EnemyCount] = new Unit(0, 3, x, y, 100, 0);
+	Enemies[EnemyCount] = new Unit(0, 3, x, y, 80, 0);
 	Enemies[EnemyCount]->Id = EnemyCount;
 	Enemies[EnemyCount]->IsEnemy = true;
 	Enemies[EnemyCount]->BulletType = BulletType[3];
