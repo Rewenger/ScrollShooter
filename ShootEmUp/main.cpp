@@ -15,7 +15,7 @@ bool init() {
 		int x = (GetSystemMetrics(SM_CXSCREEN)-SCREEN_WIDTH-SIDEBAR_WIDTH)/2;
 		int y = (GetSystemMetrics(SM_CYSCREEN)-SCREEN_HEIGHT)/2;
 		SetWindowPos( hwnd, HWND_TOP, x, y, SCREEN_WIDTH+SIDEBAR_WIDTH, SCREEN_HEIGHT, NULL );
-	}
+	}//
 
 	if( TTF_Init() == -1 )
         return false;
@@ -244,7 +244,15 @@ int CreateLeaderboard() {
 	char* ProcStr = new char[512];
 	char *tempstr = new char[512];
 
-	LeaderMessagePart[++count] = TTF_RenderText_Solid( FNT_BrushM, "Best players:", textColor );
+	// take strings from text file in language folder
+	std::string path = "Data\\"+std::string(LANG_FOLDER);
+	path = path+"\\Records.txt";
+	std::ifstream text(path);
+	std::string line1, line2;
+	std::getline(text, line1);
+	std::getline(text, line2);
+
+	LeaderMessagePart[++count] = TTF_RenderText_Solid( FNT_BrushM, line1.c_str(), textColor );
 	for (int i = 0; i < LB_SIZE; i++) {
 		sprintf(ProcStr, "%d", i+1);
 		strcat(ProcStr, ") ");
@@ -252,7 +260,7 @@ int CreateLeaderboard() {
 		strcat(ProcStr, ": ");
 		sprintf(tempstr, "%d", lb->StatValue[i][0]);
 		strcat(ProcStr, tempstr);
-		strcat(ProcStr, " pts, lives: ");
+		strcat(ProcStr, line2.c_str());
 		sprintf(tempstr, "%d", lb->StatValue[i][1]);
 		strcat(ProcStr, tempstr);
 		LeaderMessagePart[++count] = TTF_RenderText_Solid( FNT_BrushM, ProcStr, textColor );
@@ -496,16 +504,18 @@ int main( int argc, char* args[] ) {
 		int GameScore = game->Score;
 		int GameLives = game->Hero->Health;
 		int pos = 0;
-		for (int i = lb->recordcount; i >= 0; i--) {
-			if (lb->StatValue[i-1][0] <= GameScore)
+		for (int i = lb->recordcount-1; i >= 0; i--) {
+			if (lb->StatValue[i][0] < GameScore)
 				pos = i;
 		}
 		if (GameScore >= lb->StatValue[lb->recordcount-1][0] && name != "") {
-			for (int i = lb->recordcount-1; i > pos; i--) {
+			for (int i = lb->recordcount-1; i >= pos; i--) {
 				lb->StatValue[i][0] = lb->StatValue[i-1][0];
 				lb->StatValue[i][1] = lb->StatValue[i-1][1];
 				lb->PlayerName[i] = lb->PlayerName[i-1];
+				printf("moving %d to %d", i-1, i);
 			}
+			printf("new score assigned to %d", pos);
 			lb->StatValue[pos][0] = GameScore;
 			lb->StatValue[pos][1] = GameLives;
 			char *y = new char[name.length() + 1];

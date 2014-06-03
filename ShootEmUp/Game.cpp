@@ -84,7 +84,7 @@ void GameEntity::Exp01(int target, int bullet) {
 			Enemies[target]->Health = 9999;
 			SpawnTimer = 0;
 			Victory = true;
-			Score+=20;
+			Score+=40;
 			STATE_Pause = true;
 		}
 	}
@@ -147,7 +147,7 @@ void GameEntity::Exp05(int target, int bullet) {
 						Enemies[i]->Health = 9999;
 						SpawnTimer = 0;
 						Victory = true;
-						Score+=20;
+						Score+=40;
 						STATE_Pause = true;
 					}
 				}
@@ -183,7 +183,7 @@ void GameEntity::ExplosionWave(int count) {
 								Enemies[i]->Health = 9999;
 								SpawnTimer = 0;
 								Victory = true;
-								Score+=20;
+								Score+=40;
 								STATE_Pause = true;
 							}
 						}
@@ -813,6 +813,11 @@ void GameEntity::NewGame() {
 	Hero->BulletType = BulletType[0];
 	Hero->Charge = 0;
 	Hero->CollisionIgnore = false;
+	Hero->VelocityMax = 7.0;
+	Hero->AccelX = 0.7;
+	Hero->AccelY = 0.7;
+	Hero->DecelRate = 2.0; 
+	Hero->width-=4;
 
 	// create enemy
 	for (int i = 0; i < 100; i++)

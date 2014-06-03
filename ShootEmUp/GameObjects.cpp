@@ -109,6 +109,8 @@ Unit::Unit(int DataImageNumber, int clip, int PosX, int PosY, int hp, int BltTyp
 
 void Unit::Damage(int value) {
 	Health-=value;
+	if (Health < 0)
+		Health = 0;
 }
 
 void Unit::DirectionalAccel(bool left, bool right, bool up, bool down) {

@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(test_case2) {
 
 // тест - проверка на корректную загрузку значений очков из файла таблицы рекордов
 BOOST_AUTO_TEST_CASE(test_case3) {
-	lb = new Leaderboard("D:\\ShootEmUp unit testing\\Debug\\records.ini", 8);
+	lb = new Leaderboard("D:\\ShootEmUp\\Debug\\records.ini", 8);
 	lb->Update();
 	int values[8];
 	for (int i = 0; i < 8; i++)
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(test_case3) {
 
 // тест - проверка на корректную загрузку значения жизней из файла таблицы рекордов
 BOOST_AUTO_TEST_CASE(test_case4) {
-	lb = new Leaderboard("D:\\ShootEmUp unit testing\\Debug\\records.ini", 8);
+	lb = new Leaderboard("D:\\ShootEmUp\\Debug\\records.ini", 8);
 	lb->Update();
 	int values[8];
 	for (int i = 0; i < 8; i++)

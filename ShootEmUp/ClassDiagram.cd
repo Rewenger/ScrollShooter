@@ -1,70 +1,70 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="SpriteData" Collapsed="true">
-    <Position X="7" Y="1.5" Width="1.5" />
+  <Class Name="SpriteData">
+    <Position X="9.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AgAAAAAAAAAAAAAAAAEAAEAAAAAAAAAAAAACAAAAAAA=</HashCode>
       <FileName>Data.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="GameEntity" Collapsed="true">
-    <Position X="7" Y="0.5" Width="1.5" />
+  <Class Name="GameEntity">
+    <Position X="7.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>GRnAynFAJwIUJApAFCSAQCBoFGEgUSoEAJmCIUAQIAw=</HashCode>
       <FileName>Game.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="GameObject" Collapsed="true">
-    <Position X="1.75" Y="0.5" Width="1.5" />
+  <Class Name="GameObject">
+    <Position X="2.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAECAAACKAAAAQAwAAAAAAAAgAAIBDAAQBgQAIAAAA=</HashCode>
       <FileName>GameObjects.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ProjectileType" Collapsed="true">
-    <Position X="5.25" Y="1.5" Width="1.5" />
+  <Class Name="ProjectileType">
+    <Position X="5.75" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAAAACAAAAAAAEAAAAAAAAAgAAAACBAAAAEAAAEAAA=</HashCode>
       <FileName>GameObjects.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Unit" Collapsed="true">
+  <Class Name="Unit">
     <Position X="0.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACgADAAAQAhAAAIAAAAAABAAAAAAAgAAAAAEAAAAA=</HashCode>
       <FileName>GameObjects.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Projectile" Collapsed="true">
-    <Position X="2.75" Y="1.75" Width="1.5" />
+  <Class Name="Projectile">
+    <Position X="4" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAgAAAAAAAAAAAAAAAAAgAABAQBAIAA=</HashCode>
       <FileName>GameObjects.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Button" Collapsed="true">
-    <Position X="5.25" Y="0.5" Width="1.5" />
+  <Class Name="Button">
+    <Position X="5.75" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAAQAAAAAAAIAAAgAAAAAAAAAgBAABACAAAAA=</HashCode>
       <FileName>Imagework.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Leaderboard" Collapsed="true">
-    <Position X="8.75" Y="0.5" Width="1.5" />
+  <Class Name="Leaderboard">
+    <Position X="9.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAUAAYBAAAAAAAAAAAAAAAAAAAAAAABACAAAAAAAAAA=</HashCode>
       <FileName>Leaderboard.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Timer" Collapsed="true">
-    <Position X="8.75" Y="1.5" Width="1.5" />
+  <Class Name="Timer">
+    <Position X="9.75" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAIAAAAAAAAAAIAgAAAAEgAQAAAhCAAAAAQAAIAEIAA=</HashCode>
       <FileName>Timer.h</FileName>
     </TypeIdentifier>
   </Class>
   <Typedef Name="Type_PatternFunc" Collapsed="true">
-    <Position X="5.25" Y="2.75" Width="1.5" />
+    <Position X="4" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Game.h</FileName>
